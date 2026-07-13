@@ -471,8 +471,9 @@
       upload) are simulated in-browser against the same rules the backend applies.</li>
     <li data-r="3"><b>The invoice "OCR" in this demo assembles its extract from the order
       book</b> — the production extractor is an LLM behind a fail-loud seam, not shipped in a
-      static page. The receiving pill has a "file a sample one" button so the flow is testable
-      without an invoice in hand.</li>
+      static page. The receiving pill's "file a sample one" button makes the flow testable:
+      the sample carries one price 5% over last-paid, so you can watch it land on the draft
+      order and raise the price flag (which the nightly run raises in production).</li>
     <li data-r="3"><b>The report card says "small n" because n is small.</b> 13 banded
       forecasts is a calibration baseline. The claim is the discipline — forecast, band, grade,
       publish — not the percentage.</li>
