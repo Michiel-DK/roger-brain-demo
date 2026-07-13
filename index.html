@@ -133,13 +133,42 @@
   .orows { display: grid; gap: .45rem; }
   .orow { display: flex; align-items: baseline; gap: .6rem; font-family: var(--mono);
     font-size: .72rem; color: var(--ink-muted); border-bottom: 1px dashed var(--hairline);
-    padding-bottom: .4rem; }
+    padding-bottom: .4rem; transition: background .5s; }
   .orow b { color: var(--ink); font-weight: 600; }
   .orow .r { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .osum { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; }
-  .doorline { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .8rem;
-    font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); }
-  .doorline b { color: var(--teal); }
+
+  /* the door beat: a realistic invoice drops in, goes into the chat, gets filed —
+     phases stepped by [data-p] on the canvas (paper → read → filed), reset on exit */
+  .doorbeat { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .85rem; }
+  .dlabel { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: .6rem; }
+  .invpaper { background: #fff; border: 1px solid var(--hairline); border-radius: 4px;
+    box-shadow: 0 2px 6px #26241f1a, 0 14px 28px -18px #26241f4d;
+    padding: .7rem .85rem .6rem; font-family: var(--mono); font-size: .64rem;
+    color: #3a372f; max-width: 19rem; transform: translateY(14px) rotate(-1.6deg);
+    opacity: 0; transition: opacity .5s, transform .5s; }
+  :is([data-p="paper"],[data-p="read"],[data-p="filed"]) .invpaper {
+    opacity: 1; transform: rotate(-1.6deg); }
+  [data-p="read"] .invpaper { border-color: var(--teal); }
+  .invpaper .ih { font-weight: 700; letter-spacing: .06em; color: #26241f; }
+  .invpaper .im { color: #8a8474; margin: .1rem 0 .5rem; border-bottom: 1px solid #eceade;
+    padding-bottom: .35rem; }
+  .invpaper .il { display: flex; justify-content: space-between; gap: 1rem; padding: .12rem 0;
+    font-variant-numeric: tabular-nums; }
+  .invpaper .it { display: flex; justify-content: space-between; gap: 1rem; margin-top: .35rem;
+    border-top: 1px solid #eceade; padding-top: .3rem; font-weight: 700; color: #26241f;
+    font-variant-numeric: tabular-nums; }
+  .decho { margin: .7rem 0 0 auto; width: fit-content; max-width: 100%;
+    background: var(--teal); color: var(--card); font-size: .78rem;
+    border-radius: 13px 13px 4px 13px; padding: .42rem .85rem;
+    opacity: 0; transform: translateY(6px); transition: opacity .45s, transform .45s; }
+  :is([data-p="read"],[data-p="filed"]) .decho { opacity: 1; transform: none; }
+  .decho .reading { display: inline; }
+  .decho .done { display: none; }
+  [data-p="filed"] .decho .reading { display: none; }
+  [data-p="filed"] .decho .done { display: inline; }
+  [data-p="filed"] .orow.beer { background: var(--teal-soft); }
 
   /* ---------- 03 doubt ---------- */
   .dcols { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
@@ -211,8 +240,8 @@
     reality and publishes the score. Built for independent restaurant groups.</p>
   <div class="cta">
     <a class="btn primary" href="app/">open the brain map →</a>
-    <a class="btn" href="app/#/front">the pill</a>
-    <a class="btn" href="app/#/receive">the door</a>
+    <a class="btn" href="app/#/front">front of house</a>
+    <a class="btn" href="app/#/receive">receiving</a>
     <span class="cap">a static build of the real frontend — fictional venue, real engine output</span>
   </div>
   <p class="hint">scroll — five moments ↓</p>
@@ -279,23 +308,32 @@
     <a class="go" href="app/#/receive">file one at the door →</a>
   </div>
   <div class="stagecell">
-    <div class="stage frame">
+    <div class="stage frame" data-stage="door">
       <div class="chrome"><span class="dot"></span><b>tonight's draft</b>
         <span class="right">38 lines · 5 suppliers</span></div>
-      <div class="canvas">
+      <div class="canvas" id="doorcanvas">
         <div class="orows">
           <div class="orow" data-r="1"><b>Makro</b><span class="r">22 lines</span></div>
           <div class="orow" data-r="2"><b>Frutas do Mercado</b><span class="r">11 lines</span></div>
-          <div class="orow" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
+          <div class="orow beer" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
           <div class="orow" data-r="4"><b>Padaria do Bairro</b><span class="r">1 line</span></div>
           <div class="orow" data-r="5"><b>Talho Central</b><span class="r">1 line</span></div>
         </div>
-        <div class="osum" data-r="5">
-          <span class="chip">forecast − on-hand → qty</span>
-          <span class="chip">amends teach the brain</span>
+        <div class="doorbeat">
+          <p class="dlabel" data-r="5">…two days later, at the back door</p>
+          <div class="invpaper" aria-hidden="true">
+            <div class="ih">DOIS CORVOS — CERVEJEIRA</div>
+            <div class="im">fatura · 31 May 2026 · Burger House</div>
+            <div class="il"><span>IPA 33cl · 7 case × €33.60</span><span>€235.20</span></div>
+            <div class="il"><span>Pilsner 33cl · 11 case × €28.80</span><span>€316.80</span></div>
+            <div class="il"><span>Session IPA 33cl · 7 case × €31.20</span><span>€218.40</span></div>
+            <div class="it"><span>TOTAL</span><span>€770.40</span></div>
+          </div>
+          <p class="decho" role="status">
+            <span class="reading">reading the invoice…</span>
+            <span class="done">read 3 lines · €770.40 — filed ✓ prices on the books</span>
+          </p>
         </div>
-        <p class="doorline" data-r="5">…and back in at the door: invoice from Dois Corvos ·
-          3 lines read · €770.40 — <b>filed ✓ prices updated</b></p>
       </div>
     </div>
   </div>
@@ -458,11 +496,29 @@
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       e.target.classList.toggle("on", e.isIntersecting);
-      if (e.isIntersecting && e.target.dataset.stage === "pill") startPill();
-      if (!e.isIntersecting && e.target.dataset.stage === "pill") stopPill();
+      if (e.target.dataset.stage === "pill") e.isIntersecting ? startPill() : stopPill();
+      if (e.target.dataset.stage === "door") e.isIntersecting ? startDoor() : stopDoor();
     }
   }, { threshold: 0.35 });
   document.querySelectorAll(".stage").forEach((el) => io.observe(el));
+
+  // The door beat — the invoice drops in, goes into the chat, gets filed.
+  let doorTimers = [];
+  function startDoor() {
+    stopDoor();
+    const c = document.getElementById("doorcanvas");
+    if (REDUCED) { c.dataset.p = "filed"; return; }
+    doorTimers = [
+      setTimeout(() => { c.dataset.p = "paper"; }, 1600),
+      setTimeout(() => { c.dataset.p = "read"; }, 3000),
+      setTimeout(() => { c.dataset.p = "filed"; }, 4400),
+    ];
+  }
+  function stopDoor() {
+    doorTimers.forEach(clearTimeout);
+    doorTimers = [];
+    document.getElementById("doorcanvas").dataset.p = "";
+  }
 
   // The pill typewriter — question, then the answer typed into the field.
   const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
