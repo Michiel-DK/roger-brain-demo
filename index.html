@@ -4,12 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>roger brain — an operations brain that grades its own work</title>
-<meta name="description" content="Scroll-driven demo of roger brain: forecast-anchored ordering, one-question-a-day counts, invoice reading, and a self-graded report card — for restaurant groups.">
+<meta name="description" content="Scroll-driven demo of roger brain: forecast-anchored ordering, doubt-ranked counts, invoice reading, and a self-graded report card — for restaurant groups.">
 <link rel="icon" href="app/favicon.svg">
 <!--
   DESIGN DIRECTION (committed before build — ui-maker step 2)
-  · Genre: editorial scrollytelling product walk-through — the same house pattern as the
-    roger3000-demo landing ("the machine, in five moments"), retold for a restaurant brain.
+  · Genre: editorial scrollytelling product walk-through. The narrative spine is the
+    APPROVED skeleton v7 arc ("the brain, in five moments"): learn → refill → doubt →
+    ask → recap. The door (receiving) lives inside refill's loop; the report card
+    inside recap — nothing from the shipped product is dropped, the arc is v7's.
   · Type: Charter / Iowan Old Style / Georgia for headlines + numbers-that-matter; ui-monospace
     for labels, units, data chips; system sans body. IDENTICAL roles to the shipped app.
   · Color: the app's own warm-paper tokens (frontend/src/index.css) — paper #F5F1E8, card
@@ -50,7 +52,7 @@
   .eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em;
     text-transform: uppercase; color: var(--ink-faint); }
   .hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(2rem, 5vw, 3.1rem);
-    letter-spacing: -.01em; margin: .6rem 0 .7rem; text-wrap: balance; max-width: 22ch; }
+    letter-spacing: -.01em; margin: .6rem auto .7rem; text-wrap: balance; max-width: 22ch; }
   .hero .sub { color: var(--ink-muted); max-width: 52ch; margin: 0 auto; font-size: 1.02rem; }
   .cta { display: flex; gap: .6rem; justify-content: center; margin-top: 1.7rem; flex-wrap: wrap; }
   .btn { font-family: var(--mono); font-size: .78rem; text-decoration: none;
@@ -81,6 +83,7 @@
   .txt .fine { font-family: var(--mono); font-size: .67rem; color: var(--ink-faint);
     border-top: 1px solid var(--hairline); padding-top: .6rem; margin-top: 1.1rem; max-width: 48ch; }
   .txt .go { display: inline-block; margin-top: .9rem; font-family: var(--mono); font-size: .74rem; }
+  .txt .go + .go { margin-left: 1.2rem; }
 
   /* staged reveals: children fade/rise when the row enters */
   .stage [data-r] { opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s; }
@@ -110,7 +113,48 @@
   .tag.watch { color: var(--amber); background: var(--amber-soft); border: 1px solid #8a6d1f38; }
   .tag.miss { color: var(--red); background: var(--red-soft); border: 1px solid #a63d2f38; }
 
-  /* ---------- M1: the pill ---------- */
+  /* ---------- 01 learn ---------- */
+  .fchips { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+  .flowarr { display: block; margin: .35rem auto; }
+  .flowarr path { stroke: var(--teal); stroke-width: 1.5; fill: none;
+    stroke-dasharray: 6 5; animation: dashmove 1.1s linear infinite; }
+  @keyframes dashmove { to { stroke-dashoffset: -11; } }
+  .vgrid { display: grid; gap: .55rem; }
+  .vcard { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper);
+    padding: .6rem .75rem; }
+  .vcard .n { display: flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .85rem; }
+  .vcard .n .r { margin-left: auto; font-family: var(--mono); font-size: .66rem; font-weight: 400;
+    color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .vcard .learned { font-family: var(--mono); font-size: .66rem; color: var(--ink-muted);
+    margin-top: .3rem; }
+  .vdot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); flex: none; }
+
+  /* ---------- 02 refill ---------- */
+  .orows { display: grid; gap: .45rem; }
+  .orow { display: flex; align-items: baseline; gap: .6rem; font-family: var(--mono);
+    font-size: .72rem; color: var(--ink-muted); border-bottom: 1px dashed var(--hairline);
+    padding-bottom: .4rem; }
+  .orow b { color: var(--ink); font-weight: 600; }
+  .orow .r { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .osum { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; }
+  .doorline { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .8rem;
+    font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); }
+  .doorline b { color: var(--teal); }
+
+  /* ---------- 03 doubt ---------- */
+  .dcols { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  @media (max-width: 420px) { .dcols { grid-template-columns: 1fr; } }
+  .dcol { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper);
+    padding: .55rem .65rem; }
+  .dcol .h { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: .45rem; }
+  .ditem { font-size: .78rem; padding: .3rem 0; border-bottom: 1px dashed var(--hairline); }
+  .ditem:last-child { border-bottom: none; }
+  .ditem .m { display: block; font-family: var(--mono); font-size: .64rem; color: var(--ink-muted);
+    font-variant-numeric: tabular-nums; }
+  .ditem .m b { color: var(--red); font-weight: 600; }
+
+  /* ---------- 04 ask (the pill) ---------- */
   .pillbox { max-width: 22rem; margin: 0 auto; }
   .pillq { font-family: var(--serif); font-size: 1.08rem; margin: .5rem 0 .8rem; min-height: 3.2em; }
   .fcaret { display: inline-block; width: 1px; height: 1em; background: currentColor;
@@ -125,52 +169,26 @@
   .pillnote { font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); margin-top: .8rem; }
   .pillnote b { color: var(--ink); }
 
-  /* ---------- M2: the order ---------- */
-  .orows { display: grid; gap: .45rem; }
-  .orow { display: flex; align-items: baseline; gap: .6rem; font-family: var(--mono);
-    font-size: .72rem; color: var(--ink-muted); border-bottom: 1px dashed var(--hairline);
-    padding-bottom: .4rem; }
-  .orow b { color: var(--ink); font-weight: 600; }
-  .orow .r { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .osum { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; }
-
-  /* ---------- M3: the door ---------- */
-  .inv { display: grid; gap: .4rem; }
-  .invline { display: flex; font-family: var(--mono); font-size: .7rem; color: var(--ink-muted);
-    background: var(--paper); border: 1px solid var(--hairline); border-radius: 8px;
-    padding: .4rem .6rem; }
-  .invline .r { margin-left: auto; font-variant-numeric: tabular-nums; }
-  .filed { font-family: var(--mono); font-size: .72rem; color: var(--teal); margin-top: .7rem; }
-
-  /* ---------- M4: the report card ---------- */
-  .meter { margin: .4rem 0 1rem; }
+  /* ---------- 05 recap ---------- */
+  .rsay { font-family: var(--serif); font-size: 1.02rem; margin: .4rem 0 .6rem; }
+  .rsay b { font-variant-numeric: tabular-nums; }
+  .rreply { margin: .6rem 0 0 auto; width: fit-content; background: var(--teal); color: var(--card);
+    font-style: italic; font-size: .84rem; border-radius: 13px 13px 4px 13px; padding: .4rem .85rem; }
+  .rfiled { margin-top: .6rem; font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); }
+  .meter { margin: .9rem 0 .4rem; }
   .meter .lbl { display: flex; justify-content: space-between; font-family: var(--mono);
     font-size: .66rem; color: var(--ink-muted); margin-bottom: .35rem; }
   .meter .bar { height: 10px; border-radius: 999px; background: var(--paper-deep); overflow: hidden; }
   .meter .fill { height: 100%; width: 0; border-radius: 999px; background: var(--teal);
     transition: width 1.1s cubic-bezier(.2,.7,.2,1) .3s; }
   .stage.on .meter .fill { width: 92.3%; }
-  .bignum { font-family: var(--serif); font-size: 2.1rem; font-variant-numeric: tabular-nums; }
-  .gradegrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; margin-top: .6rem; }
-  .gcell { border: 1px solid var(--hairline); border-radius: 10px; padding: .55rem .7rem;
-    background: var(--paper); }
-  .gcell .k { font-family: var(--mono); font-size: .6rem; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--ink-faint); }
-  .gcell .v { font-family: var(--serif); font-size: 1.05rem; margin-top: .15rem; }
-  .missrow { margin-top: .8rem; border-left: 3px solid var(--red); background: var(--red-soft);
-    border-radius: 0 10px 10px 0; padding: .55rem .75rem; font-size: .8rem; color: var(--ink-muted); }
+  .bignum { font-family: var(--serif); font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+  .missrow { margin-top: .7rem; border-left: 3px solid var(--red); background: var(--red-soft);
+    border-radius: 0 10px 10px 0; padding: .5rem .7rem; font-size: .78rem; color: var(--ink-muted); }
   .missrow b { color: var(--ink); font-variant-numeric: tabular-nums; }
-
-  /* ---------- M5: the group ---------- */
-  .vgrid { display: grid; gap: .55rem; }
-  .vcard { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper);
-    padding: .6rem .75rem; }
-  .vcard .n { display: flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .85rem; }
-  .vcard .n .r { margin-left: auto; font-family: var(--mono); font-size: .66rem; font-weight: 400;
-    color: var(--ink-muted); font-variant-numeric: tabular-nums; }
-  .vcard .learned { font-family: var(--mono); font-size: .66rem; color: var(--ink-muted);
-    margin-top: .3rem; }
-  .vdot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); flex: none; }
+  .rcsep { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .7rem;
+    font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); }
 
   /* ---------- honesty + footer ---------- */
   .honest { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 3rem; }
@@ -188,9 +206,9 @@
 <header class="hero stage" id="hero">
   <p class="eyebrow">roger brain · a working demo</p>
   <h1>An operations brain that grades its own work.</h1>
-  <p class="sub">It forecasts demand, drafts the supplier order, asks the floor one question a day,
-    reads the invoices at the door — and then checks its own predictions against reality and
-    publishes the score. Built for independent restaurant groups.</p>
+  <p class="sub">It learns each venue from data it already has, drafts the orders, doubts its own
+    books out loud, asks the floor one question a day — and then checks its predictions against
+    reality and publishes the score. Built for independent restaurant groups.</p>
   <div class="cta">
     <a class="btn primary" href="app/">open the brain map →</a>
     <a class="btn" href="app/#/front">the pill</a>
@@ -200,8 +218,150 @@
   <p class="hint">scroll — five moments ↓</p>
 </header>
 
-<!-- ============ M1 · THE PILL ============ -->
+<!-- ============ 01 · LEARN ============ -->
 <section class="row" id="m1">
+  <div class="stagecell">
+    <div class="stage frame">
+      <div class="chrome"><span class="dot"></span><b>Burger House</b> · onboarding
+        <span class="right">replaying your history</span></div>
+      <div class="canvas">
+        <div class="fchips" data-r="1">
+          <span class="chip">sales · POS export</span>
+          <span class="chip">counts · excel</span>
+          <span class="chip">invoices · pdf</span>
+        </div>
+        <svg class="flowarr" data-r="2" width="24" height="34" viewBox="0 0 24 34" aria-hidden="true">
+          <path d="M12 2 L12 26 M5 20 L12 27 L19 20"/>
+        </svg>
+        <div class="vgrid">
+          <div class="vcard" data-r="3">
+            <div class="n"><span class="vdot"></span>Downtown<span class="r">31 days replayed</span></div>
+            <div class="learned">learned: even weekday demand — no skew worth correcting for</div>
+          </div>
+          <div class="vcard" data-r="4">
+            <div class="n"><span class="vdot"></span>Riverside<span class="r">31 days replayed</span></div>
+            <div class="learned">learned: Sat +5% vs a flat week · lunch-led, peak 12:00</div>
+          </div>
+          <div class="vcard" data-r="5">
+            <div class="n"><span class="vdot"></span>Beach<span class="r">31 days replayed</span></div>
+            <div class="learned">learned: Sun +10%, Tue +3% — its own rhythm, its own pars</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="txt">
+    <p class="kicker">01 · learn</p>
+    <h2>It starts with files you already have.</h2>
+    <p>No forms, no data entry project. Sales exports, count sheets and supplier invoices are
+      replayed into one brain per venue — and the venues genuinely diverge: one runs flat all
+      week, the next peaks Saturdays, the third Sundays. Each learns its own rhythm; the group
+      brain sits over all three.</p>
+    <p class="fine">the learned patterns are inspectable in the app — every one names the data
+      it was learned from and what it drives.</p>
+    <a class="go" href="app/#/node/group/learning">see what it learned →</a>
+  </div>
+</section>
+
+<!-- ============ 02 · REFILL ============ -->
+<section class="row flip" id="m2">
+  <div class="txt">
+    <p class="kicker">02 · refill</p>
+    <h2>Orders start from the forecast. You keep the OK.</h2>
+    <p>Every night: forecast tomorrow's demand from the learned rhythm, subtract what's on hand,
+      respect pack sizes, price each line from the latest invoice actually paid. The draft lands
+      consolidated per supplier; you amend or approve — and every amend is a correction the
+      brain learns from. When the delivery lands, the invoice is photographed at the door, read
+      line-by-line, and the prices feed the next draft.</p>
+    <p class="fine">approve is idempotent — a double-tap can never order twice. the invoice echo
+      is verbatim: what the brain read is what you see.</p>
+    <a class="go" href="app/#/node/group/orders">amend the draft →</a>
+    <a class="go" href="app/#/receive">file one at the door →</a>
+  </div>
+  <div class="stagecell">
+    <div class="stage frame">
+      <div class="chrome"><span class="dot"></span><b>tonight's draft</b>
+        <span class="right">38 lines · 5 suppliers</span></div>
+      <div class="canvas">
+        <div class="orows">
+          <div class="orow" data-r="1"><b>Makro</b><span class="r">22 lines</span></div>
+          <div class="orow" data-r="2"><b>Frutas do Mercado</b><span class="r">11 lines</span></div>
+          <div class="orow" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
+          <div class="orow" data-r="4"><b>Padaria do Bairro</b><span class="r">1 line</span></div>
+          <div class="orow" data-r="5"><b>Talho Central</b><span class="r">1 line</span></div>
+        </div>
+        <div class="osum" data-r="5">
+          <span class="chip">forecast − on-hand → qty</span>
+          <span class="chip">amends teach the brain</span>
+        </div>
+        <p class="doorline" data-r="5">…and back in at the door: invoice from Dois Corvos ·
+          3 lines read · €770.40 — <b>filed ✓ prices updated</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 · DOUBT ============ -->
+<section class="row" id="m3">
+  <div class="stagecell">
+    <div class="stage frame">
+      <div class="chrome"><span class="dot"></span><b>what the brain doubts</b>
+        <span class="right">per venue · € at risk × staleness</span></div>
+      <div class="canvas">
+        <div class="dcols">
+          <div class="dcol" data-r="1">
+            <div class="h">Downtown — its own queue</div>
+            <div class="ditem">Beef patty (165g)
+              <span class="m"><b>€192.17</b> at risk · never counted here</span></div>
+            <div class="ditem">Burger bun
+              <span class="m"><b>€49.76</b> at risk · never counted here</span></div>
+            <div class="ditem">Dois Corvos Pilsner 33cl
+              <span class="m"><b>€28.20</b> at risk · never counted here</span></div>
+          </div>
+          <div class="dcol" data-r="2">
+            <div class="h">Beach — a different bet</div>
+            <div class="ditem">Beef patty (165g)
+              <span class="m"><b>€135.71</b> at risk · never counted here</span></div>
+            <div class="ditem">Burger bun
+              <span class="m"><b>€35.12</b> at risk · never counted here</span></div>
+            <div class="ditem">Dois Corvos Pilsner 33cl
+              <span class="m"><b>€19.93</b> at risk · never counted here</span></div>
+          </div>
+        </div>
+        <div class="osum" data-r="3">
+          <span class="chip">its sales set the € at risk</span>
+          <span class="chip">its counts reset the clock</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="txt">
+    <p class="kicker">03 · doubt</p>
+    <h2>It doubts its own books — item by item, venue by venue.</h2>
+    <p>Derived stock is a claim, not a fact — so the brain scores its own uncertainty per
+      ingredient: money at stake × time since a human confirmed × how erratically the item
+      moves. Each venue gets its own queue, priced by its own sales — Downtown's beef-patty
+      exposure is €192, Beach's €136 — and a count at one venue never silences doubt at
+      another.</p>
+    <p class="fine">this ranking is what decides the ONE question the floor gets asked (next
+      moment). answered items leave the queue; the rest re-rank.</p>
+    <a class="go" href="app/#/node/downtown/today">see a venue's checks →</a>
+  </div>
+</section>
+
+<!-- ============ 04 · ASK ============ -->
+<section class="row flip" id="m4">
+  <div class="txt">
+    <p class="kicker">04 · ask</p>
+    <h2>Front of house sees one question. That's the whole app.</h2>
+    <p>Nobody on the floor opens a dashboard. A quiet pill sits in the corner; when the brain's
+      doubt crosses a line, it asks one thing — typed out like a person, answered with a number
+      or a voice note. The answer corrects the books, grades the brain's own derivation, and
+      the pill recedes.</p>
+    <p class="fine">5 open questions across 38 tracked items in the demo world — answer one and
+      watch the count drop. fewer questions every month is the point.</p>
+    <a class="go" href="app/#/front">answer it yourself →</a>
+  </div>
   <div class="stagecell">
     <div class="stage frame pillbox" data-stage="pill">
       <div class="chrome"><span class="dot"></span><b>the brain</b>
@@ -218,165 +378,45 @@
       </div>
     </div>
   </div>
-  <div class="txt">
-    <p class="kicker">moment 01 · the ask</p>
-    <h2>One question a day, not a stock-take.</h2>
-    <p>Perpetual inventory drifts; full counts burn hours. The brain derives on-hand from sales
-      and deliveries, tracks its own <em>doubt</em> per ingredient (value at risk × days since
-      a human confirmed), and spends its one daily question where doubt × money is highest.
-      The answer corrects the books and re-anchors the derivation.</p>
-    <p class="fine">the queue is ranked, not random: 5 open questions across 38 tracked items in
-      the demo world. answering one visibly re-ranks the rest.</p>
-    <a class="go" href="app/#/front">answer it yourself →</a>
-  </div>
 </section>
 
-<!-- ============ M2 · THE ORDER ============ -->
-<section class="row flip" id="m2">
-  <div class="txt">
-    <p class="kicker">moment 02 · the order</p>
-    <h2>The order drafts itself — from the forecast, not a par sheet.</h2>
-    <p>Every night: forecast tomorrow's demand from the venue's learned rhythm, subtract what's
-      on hand, respect pack sizes, and price each line from the latest invoice actually paid.
-      The draft lands consolidated per supplier; the manager amends or approves. Every amend is
-      recorded as a correction the brain learns from.</p>
-    <p class="fine">38 lines across 5 suppliers in tonight's draft. approve is idempotent — a
-      double-tap can never order twice.</p>
-    <a class="go" href="app/#/node/group/orders">amend the draft →</a>
-  </div>
+<!-- ============ 05 · RECAP ============ -->
+<section class="row" id="m5">
   <div class="stagecell">
     <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>tonight's draft</b>
-        <span class="right">38 lines · 5 suppliers</span></div>
+      <div class="chrome"><span class="dot"></span><b>the brain</b> · day recap
+        <span class="right">at close</span></div>
       <div class="canvas">
-        <div class="orows">
-          <div class="orow" data-r="1"><b>Makro</b><span class="r">22 lines</span></div>
-          <div class="orow" data-r="2"><b>Frutas do Mercado</b><span class="r">11 lines</span></div>
-          <div class="orow" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
-          <div class="orow" data-r="4"><b>Padaria do Bairro</b><span class="r">1 line</span></div>
-          <div class="orow" data-r="5"><b>Talho Central</b><span class="r">1 line</span></div>
-        </div>
-        <div class="osum" data-r="5">
-          <span class="chip">forecast − on-hand → qty</span>
-          <span class="chip">priced from last invoice</span>
-          <span class="chip">amends teach the brain</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ M3 · THE DOOR ============ -->
-<section class="row" id="m3">
-  <div class="stagecell">
-    <div class="stage frame pillbox">
-      <div class="chrome"><span class="dot"></span><b>receiving</b>
-        <span class="right">Burger House · 2026-05-31</span></div>
-      <div class="canvas">
-        <p class="pillq" style="min-height:auto" data-r="1">what landed at the door?
-          photo the invoice and I'll read it.</p>
-        <div class="inv">
-          <div class="invline" data-r="2">Dois Corvos IPA 33cl<span class="r">7 × €33.60</span></div>
-          <div class="invline" data-r="3">Dois Corvos Pilsner 33cl<span class="r">11 × €28.80</span></div>
-          <div class="invline" data-r="4">Dois Corvos Session IPA 33cl<span class="r">7 × €31.20</span></div>
-        </div>
-        <p class="filed" data-r="5">filed ✓ — €770.40 · prices updated on the books.</p>
-      </div>
-    </div>
-  </div>
-  <div class="txt">
-    <p class="kicker">moment 03 · the door</p>
-    <h2>Invoices are data, not paperwork.</h2>
-    <p>A photo at the back door is read line-by-line and echoed back verbatim — what the brain
-      read is what you see, never a summary it composed. The prices land on the books and feed
-      three things at once: the € on the next draft order, the overpay checks, and the food-cost
-      ledger.</p>
-    <p class="fine">in production the reader is an LLM extractor behind a fail-loud seam; in this
-      static demo the extract is assembled from the order book (labelled below).</p>
-    <a class="go" href="app/#/receive">file one at the door →</a>
-  </div>
-</section>
-
-<!-- ============ M4 · THE REPORT CARD ============ -->
-<section class="row flip" id="m4">
-  <div class="txt">
-    <p class="kicker">moment 04 · the grade</p>
-    <h2>It predicts with a band — then publishes whether reality landed inside.</h2>
-    <p>Every forecast ships with an 80%-confidence band and becomes a row in a decision ledger:
-      forecasts, order drafts, drift flags, spot-checks — 27 decisions in the demo world, each
-      graded once reality arrives. The report card replays the whole history and states the
-      coverage. Misses aren't hidden; the worst one is the headline.</p>
-    <p class="fine">n is small and the page says so — 13 banded forecasts is a baseline, not a
-      brag. the discipline of grading is the product; the number just has to be honest.</p>
-    <a class="go" href="app/#/node/group/grades">read the ledger →</a>
-  </div>
-  <div class="stagecell">
-    <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>the report card</b>
-        <span class="right">replayed over 20 graded calls</span></div>
-      <div class="canvas">
-        <div class="meter" data-r="1">
+        <p class="rsay" data-r="1">yesterday landed <b>inside my band</b> — €4,156 called,
+          €4,228 real. anything I should know before I set tomorrow up?</p>
+        <p class="rreply" data-r="2">waste 2 each burger bun</p>
+        <p class="rfiled" data-r="2"><span class="tag ok">filed</span> waste · Burger bun · 2 each</p>
+        <p class="rcsep" data-r="3">and over the month — the report card</p>
+        <div class="meter" data-r="3">
           <div class="lbl"><span>band coverage — target 80%</span><span><b>12 / 13 in band</b></span></div>
           <div class="bar"><div class="fill"></div></div>
         </div>
-        <span class="bignum" data-r="2">92%</span>
-        <span class="tag watch" data-r="2" style="margin-left:.5rem">small n · says so on the page</span>
-        <div class="gradegrid" data-r="3">
-          <div class="gcell"><div class="k">forecasts graded</div><div class="v">20</div></div>
-          <div class="gcell"><div class="k">ledger decisions</div><div class="v">27</div></div>
-          <div class="gcell"><div class="k">drift flags</div><div class="v">3</div></div>
-          <div class="gcell"><div class="k">spot-checks</div><div class="v">3</div></div>
-        </div>
-        <div class="missrow" data-r="4"><span class="tag miss">headline miss</span>&nbsp;
+        <p data-r="4" style="margin:.2rem 0 0">
+          <span class="bignum">92%</span>
+          <span class="tag watch" style="margin-left:.5rem">small n · says so on the page</span>
+        </p>
+        <div class="missrow" data-r="5"><span class="tag miss">headline miss</span>&nbsp;
           May 24 — called <b>€6,493</b>, band €5,425–7,562, reality <b>€7,622</b>. outside the
           band, on the record.</div>
       </div>
     </div>
   </div>
-</section>
-
-<!-- ============ M5 · THE GROUP ============ -->
-<section class="row" id="m5">
-  <div class="stagecell">
-    <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>Burger House — group</b>
-        <span class="right">food cost 31.0% · target 30% · watch it</span></div>
-      <div class="canvas">
-        <div class="vgrid">
-          <div class="vcard" data-r="1">
-            <div class="n"><span class="vdot"></span>Downtown
-              <span class="r">food cost 29% · rank 1</span></div>
-            <div class="learned">learned: even weekday demand — no skew worth correcting for</div>
-          </div>
-          <div class="vcard" data-r="2">
-            <div class="n"><span class="vdot"></span>Riverside
-              <span class="r">food cost 31% · rank 2</span></div>
-            <div class="learned">learned: demand skews by weekday — Sat +5% vs a flat week</div>
-          </div>
-          <div class="vcard" data-r="3">
-            <div class="n"><span class="vdot"></span>Beach
-              <span class="r">food cost 33% · rank 3</span></div>
-            <div class="learned">learned: Sun +10%, Tue +3% vs a flat week — its own rhythm</div>
-          </div>
-        </div>
-        <div class="osum" data-r="4">
-          <span class="chip">one brain per venue</span>
-          <span class="chip">one group brain over them</span>
-          <span class="chip">exceptions bubble up</span>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="txt">
-    <p class="kicker">moment 05 · the group</p>
-    <h2>Each venue gets its own brain. The group gets the exceptions.</h2>
-    <p>Venues genuinely differ — one is flat all week, the next peaks Saturdays — so each learns
-      its own rhythm, pars and prices. The group tier sees the league table (food cost, waste,
-      coverage) and only the things worth a human's attention: a band miss, an overpay, drift.
-      Everything else stays quietly handled below.</p>
-    <p class="fine">the map is the app's home screen: pick a brain, its rooms open, the URL
-      follows — every view is shareable.</p>
-    <a class="go" href="app/">walk the map →</a>
+    <p class="kicker">05 · recap</p>
+    <h2>At close, it tells you what it got wrong — and files what you tell it.</h2>
+    <p>The evening dialogue closes the loop: the brain owns its day out loud — inside or outside
+      its own band — and asks what it couldn't see. A waste line or a correction typed back is
+      parsed and filed, not lost in a chat log. And every graded call lands on a decision ledger
+      (27 in the demo world: forecasts, drift flags, spot-checks, an order draft) that a replay
+      harness turns into a published report card — worst miss as the headline.</p>
+    <p class="fine">n is small and the page says so — 13 banded forecasts is a calibration
+      baseline, not a brag. the discipline is the product; the number just has to be honest.</p>
+    <a class="go" href="app/#/node/group/grades">read the ledger →</a>
   </div>
 </section>
 
@@ -393,7 +433,8 @@
       upload) are simulated in-browser against the same rules the backend applies.</li>
     <li data-r="3"><b>The invoice "OCR" in this demo assembles its extract from the order
       book</b> — the production extractor is an LLM behind a fail-loud seam, not shipped in a
-      static page.</li>
+      static page. The receiving pill has a "file a sample one" button so the flow is testable
+      without an invoice in hand.</li>
     <li data-r="3"><b>The report card says "small n" because n is small.</b> 13 banded
       forecasts is a calibration baseline. The claim is the discipline — forecast, band, grade,
       publish — not the percentage.</li>
@@ -404,8 +445,8 @@
 
 <footer>
   <p class="eyebrow">roger brain</p>
-  <p>Forecast-anchored ordering · one-question counts · invoices as data ·
-    a brain per venue · and a report card it writes about itself.</p>
+  <p>Learn from files you have · refill from the forecast · doubt the books out loud ·
+    ask one question · recap and grade itself.</p>
   <div class="cta">
     <a class="btn primary" href="app/">open the demo →</a>
     <a class="btn" href="https://github.com/Michiel-DK/roger-brain-demo#readme">read the logic</a>
