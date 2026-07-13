@@ -1,11 +1,10 @@
-# roger brain — an operations brain that grades its own work
+# roger brain
 
-**[▶ View the live demo →](https://michiel-dk.github.io/roger-brain-demo/)**
+Live demo: https://michiel-dk.github.io/roger-brain-demo/
 
-A production platform for independent restaurant groups: ingest sales and invoices, model the
+An operations platform for independent restaurant groups: ingest sales and invoices, model the
 recipe → ingredient → supplier graph, forecast demand, draft the supplier orders, ask the floor
-one question a day — and then do the thing most ops software never does: **check its own
-predictions against reality and publish the score.**
+one question a day, and check its own predictions against reality and publish the score.
 
 This repo hosts a self-contained demo of the product: a scroll-driven walk-through
 (`index.html`) plus a **static build of the real frontend** (`app/`) — the group brain map, the
@@ -38,32 +37,19 @@ One nightly loop per venue, one group brain over all of them:
   the group tier sees the league table and only what deserves a human: band misses, overpays,
   drift.
 
-## The part I'm most proud of: the self-grading loop
+## Self-grading loop
 
-Most forecasting tools show you a number. This one **shows you its track record.**
-
-Every forecast ships with an 80%-confidence band and becomes a row in a **decision ledger**
+Every forecast ships with an 80%-confidence band and becomes a row in a decision ledger
 alongside order drafts, drift flags and spot-checks. When reality arrives, each row is graded.
-A **replay harness** then re-runs the whole history and publishes a report card:
+A replay harness re-runs the whole history and publishes a report card of past forecasts against
+outcomes, including the worst miss and the measured band coverage. When measured coverage (~68%)
+fell short of the claimed 80%, a conformal-style band-width fix was applied.
 
-| What's published | Demo world value |
-|---|---|
-| Banded forecasts in band | **12 / 13 (92%)** vs 80% target |
-| Decisions on the ledger | 27 (20 forecasts · 3 drift flags · 3 spot-checks · 1 order draft) |
-| Headline miss | May 24 — called €6,493 (band €5,425–7,562), reality €7,622 — **outside, on the record** |
+The ingest seams fail loud instead of degrading to valid-looking wrong values (a pre-commit
+ratchet flags any new silent fallback at a data seam), and a derived stock figure is never
+presented as a counted one.
 
-Three honesty rules make this worth trusting:
-
-1. **The worst miss is the headline**, not a footnote.
-2. **Small n says so on the page** — 13 banded forecasts is a calibration baseline, not a brag.
-3. **The bands are calibrated, not asserted** — a conformal-style band-width fix was shipped
-   when measured coverage (~68%) fell short of the claimed 80%; the report card is what caught it.
-
-The same discipline runs downward: the ingest seams **fail loud instead of degrading** to
-valid-looking wrong values (a pre-commit ratchet flags any new silent fallback at a data seam),
-and a derived stock figure is never presented as a counted one.
-
-## Engineering highlights
+## Architecture
 
 - **Ingestion pipeline** — POS exports (SAF-T, SumUp, Zonesoft API), invoice OCR (LLM
   extraction behind a fail-loud seam), weather; idempotent re-runs.
@@ -79,8 +65,8 @@ and a derived stock figure is never presented as a counted one.
 - **The pill grammar** — the floor-facing UI is one typed-out question at a time (FOH pill and
   receiving pill share it): ask → number or voice → thanks → recede. The manager app is a live
   brain map where each venue's rooms open in a routed detail pane.
-- **Full stack, shipped** — nightly jobs behind a channel-delivery seam, seeded demo deploy on
-  Railway; 500+ tests green on the private repo.
+- **Jobs and deployment** — nightly jobs behind a channel-delivery seam, seeded demo deploy on
+  Railway; test suite on the private repo.
 
 ## This demo, technically
 
