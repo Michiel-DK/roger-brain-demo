@@ -3,231 +3,231 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>roger brain — an operations brain that grades its own work</title>
-<meta name="description" content="Scroll-driven demo of roger brain: forecast-anchored ordering, doubt-ranked counts, invoice reading, and a self-graded report card — for restaurant groups.">
+<title>roger brain — plain where you work, the math in one room</title>
+<meta name="description" content="A working demo of roger brain: it learns each venue's patterns, keeps the stock levels, drafts the supplier orders, reads the invoice at the door, spot-checks the floor, and recaps the day. For independent restaurant groups.">
 <link rel="icon" href="favicon.svg">
 <!--
   DESIGN DIRECTION (committed before build — ui-maker step 2)
-  · Genre: editorial scrollytelling product walk-through. The narrative spine is the
-    APPROVED skeleton v7 arc ("the brain, in five moments"): learn → refill → doubt →
-    ask → recap. The door (receiving) lives inside refill's loop; the report card
-    inside recap — nothing from the shipped product is dropped, the arc is v7's.
-  · Type: Charter / Iowan Old Style / Georgia for headlines + numbers-that-matter; ui-monospace
-    for labels, units, data chips; system sans body. IDENTICAL roles to the shipped app.
-  · Color: the app's own warm-paper tokens (frontend/src/index.css) — paper #F5F1E8, card
-    #FDFBF6, ink #26241F, teal #3E6459 as the one action color, red #A63D2F alert-only,
-    amber #8A6D1F watch-only. Cream+serif is EARNED here: this is hospitality software and
-    the landing must read as one product with the app it links into.
-  · Motion: one mode — calm IntersectionObserver reveals + two small phase machines (the pill
-    typewriter, the grades meter). Resets on exit; honors prefers-reduced-motion.
-  · Narrative state: fictional tenant "Burger House" (3 venues), world frozen at 2026-05-31.
-    EVERY number on this page is a real response from the engine over that seeded world —
-    captured, not composed. The write loops in the linked demo are simulated (labelled below).
+  · Genre: editorial scrollytelling product walk-through, used as an OUTWARD sell doc.
+    → no internal roadmap / status / engineering-seam language on the page.
+  · Thesis: "Plain where you work. The math in one room." — plain is the two pills + plain recap;
+    stock level = demand VARIABILITY (not price); € at risk / doubt = price × staleness (05 only).
+  · Arc (6 moments, one surface per slide, clean scroll, nothing leaks):
+    learn (venues resolve, then the group brain forms over them) → stock levels (bar vs level line) →
+    orders (draft, then a line opens and amends) → reads the invoice (receiving PILL) → spot-checks
+    (doubt queue → top item ticks → sent to check → thanks) → recap (a plain question, a reply, one note filed).
+  · Motion: five small phase machines (learn+group, invoice→text, order amend, doubt→check, recap).
+    All reset on exit; honors prefers-reduced-motion.
+  · Narrative: fictional tenant "Burger House" (3 venues). Figures are real engine output over a
+    seeded demo history; stock levels illustrative. "About this demo" says so, client-appropriately.
 -->
 <style>
   :root {
     color-scheme: light;
-    --paper: #f5f1e8; --paper-deep: #ede7d9; --card: #fdfbf6;
-    --hairline: #e3dcce;
+    --paper: #f5f1e8; --paper-deep: #ede7d9; --card: #fdfbf6; --hairline: #e3dcce;
     --ink: #26241f; --ink-muted: #6e6759; --ink-faint: #9a9284;
     --teal: #3e6459; --teal-deep: #2c4a41; --teal-soft: #3e64591f;
-    --red: #a63d2f; --red-soft: #a63d2f14;
-    --amber: #8a6d1f; --amber-soft: #8a6d1f14;
+    --red: #a63d2f; --red-soft: #a63d2f14; --amber: #8a6d1f; --amber-soft: #8a6d1f14;
     --serif: "Charter", "Iowan Old Style", Georgia, serif;
     --sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
   }
   * { box-sizing: border-box; }
-  body { background: var(--paper); color: var(--ink); font-family: var(--sans);
-    margin: 0; line-height: 1.55; -webkit-font-smoothing: antialiased; }
-  @media (prefers-reduced-motion: reduce) {
-    * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); margin: 0; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  @media (prefers-reduced-motion: reduce) { * { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
   a { color: var(--teal); }
   :is(a, button):focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 
-  /* ---------- hero ---------- */
-  .hero { min-height: 94vh; display: grid; place-content: center; text-align: center;
-    padding: 3rem 1.5rem 2rem; }
-  .eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--ink-faint); }
-  .hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(2rem, 5vw, 3.1rem);
-    letter-spacing: -.01em; margin: .6rem auto .7rem; text-wrap: balance; max-width: 22ch; }
-  .hero .sub { color: var(--ink-muted); max-width: 52ch; margin: 0 auto; font-size: 1.02rem; }
+  .hero { min-height: 94vh; display: grid; place-content: center; text-align: center; padding: 3rem 1.5rem 2rem; }
+  .eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -.01em; margin: .6rem auto .5rem; text-wrap: balance; max-width: 20ch; }
+  .hero .thesis { font-family: var(--serif); font-size: clamp(1.05rem, 2.4vw, 1.35rem); color: var(--teal-deep); margin: 0 auto .8rem; font-style: italic; }
+  .hero .sub { color: var(--ink-muted); max-width: 54ch; margin: 0 auto; font-size: 1.02rem; }
   .cta { display: flex; gap: .6rem; justify-content: center; margin-top: 1.7rem; flex-wrap: wrap; }
-  .btn { font-family: var(--mono); font-size: .78rem; text-decoration: none;
-    padding: .62rem 1.05rem; border-radius: 10px; border: 1px solid var(--hairline);
-    color: var(--ink); background: var(--card); transition: transform .15s, box-shadow .15s; }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -10px #26241f40; }
-  .btn.primary { background: var(--teal); border-color: var(--teal-deep); color: #fdfbf6; }
-  .cta .cap { width: 100%; font-family: var(--mono); font-size: .64rem; color: var(--ink-faint);
-    margin-top: .55rem; }
-  .hero .hint { margin-top: 2.4rem; font-family: var(--mono); font-size: .72rem;
-    color: var(--ink-faint); animation: bob 2.4s ease infinite; }
+  .cta .cap { width: 100%; font-family: var(--mono); font-size: .64rem; color: var(--ink-faint); margin-top: .55rem; }
+  .hero .hint { margin-top: 2.4rem; font-family: var(--mono); font-size: .72rem; color: var(--ink-faint); animation: bob 2.4s ease infinite; }
   @keyframes bob { 50% { transform: translateY(5px); } }
 
-  /* ---------- scroll rows ---------- */
-  .row { min-height: 86vh; display: grid; grid-template-columns: 1.05fr .95fr; gap: 3rem;
-    align-items: center; max-width: 1060px; margin: 0 auto; padding: 3rem 2rem; }
+  .row { min-height: 86vh; display: grid; grid-template-columns: 1.05fr .95fr; gap: 3rem; align-items: center; max-width: 1060px; margin: 0 auto; padding: 3rem 2rem; }
   .row.flip .stagecell { order: 2; } .row.flip .txt { order: 1; }
   .stagecell, .txt { min-width: 0; }
-  @media (max-width: 760px) {
-    .row { grid-template-columns: 1fr; min-height: auto; gap: 1.6rem; }
-    .row.flip .stagecell { order: 0; } .row.flip .txt { order: 1; }
-  }
-  .txt .kicker { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em;
-    text-transform: uppercase; color: var(--teal); }
-  .txt h2 { font-family: var(--serif); font-weight: 500; font-size: 1.7rem;
-    margin: .45rem 0 .7rem; text-wrap: balance; }
+  @media (max-width: 760px) { .row { grid-template-columns: 1fr; min-height: auto; gap: 1.6rem; } .row.flip .stagecell { order: 0; } .row.flip .txt { order: 1; } }
+  .txt .kicker { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
+  .txt h2 { font-family: var(--serif); font-weight: 500; font-size: 1.7rem; margin: .45rem 0 .7rem; text-wrap: balance; }
   .txt p { color: var(--ink-muted); font-size: .93rem; max-width: 48ch; }
-  .txt .fine { font-family: var(--mono); font-size: .67rem; color: var(--ink-faint);
-    border-top: 1px solid var(--hairline); padding-top: .6rem; margin-top: 1.1rem; max-width: 48ch; }
-  .txt .go { display: inline-block; margin-top: .9rem; font-family: var(--mono); font-size: .74rem; }
-  .txt .go + .go { margin-left: 1.2rem; }
+  .txt p + p { margin-top: .55rem; }
+  .txt .fine { font-family: var(--mono); font-size: .67rem; color: var(--ink-faint); border-top: 1px solid var(--hairline); padding-top: .6rem; margin-top: 1.1rem; max-width: 48ch; }
 
-  /* staged reveals: children fade/rise when the row enters */
   .stage [data-r] { opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s; }
   .stage.on [data-r] { opacity: 1; transform: none; }
-  .stage.on [data-r="2"] { transition-delay: .25s; }
-  .stage.on [data-r="3"] { transition-delay: .5s; }
-  .stage.on [data-r="4"] { transition-delay: .75s; }
-  .stage.on [data-r="5"] { transition-delay: 1s; }
+  .stage.on [data-r="2"] { transition-delay: .2s; } .stage.on [data-r="3"] { transition-delay: .4s; }
+  .stage.on [data-r="4"] { transition-delay: .6s; } .stage.on [data-r="5"] { transition-delay: .8s; }
 
-  /* ---------- shared frame ---------- */
-  .frame { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px;
-    box-shadow: 0 1px 2px #26241f0a, 0 12px 32px -18px #26241f2e; overflow: hidden; }
-  .chrome { display: flex; align-items: center; gap: .5rem; padding: .55rem .85rem;
-    border-bottom: 1px solid var(--hairline); font-family: var(--mono); font-size: .68rem;
-    color: var(--ink-muted); flex-wrap: wrap; }
+  .frame { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: 0 1px 2px #26241f0a, 0 12px 32px -18px #26241f2e; overflow: hidden; }
+  .frame + .frame { margin-top: 1.1rem; }
+  .chrome { display: flex; align-items: center; gap: .5rem; padding: .55rem .85rem; border-bottom: 1px solid var(--hairline); font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); flex-wrap: wrap; }
   .chrome b { color: var(--ink); font-weight: 600; }
   .chrome .right { margin-left: auto; font-variant-numeric: tabular-nums; }
   .dot { width: 13px; height: 13px; border-radius: 50%; background: var(--teal); flex: none; }
   .canvas { padding: 1.3rem 1.3rem 1.2rem; }
+  .lead { font-family: var(--mono); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); text-align: center; margin: 0 0 .1rem; }
+  .chip { font-family: var(--mono); font-size: .68rem; padding: .34rem .6rem; border: 1px solid var(--hairline); border-radius: 8px; background: var(--paper); color: var(--ink-muted); }
 
-  .chip { font-family: var(--mono); font-size: .68rem; padding: .34rem .6rem;
-    border: 1px solid var(--hairline); border-radius: 8px; background: var(--paper);
-    color: var(--ink-muted); }
-  .tag { display: inline-block; font-family: var(--mono); font-size: .6rem; padding: .12rem .5rem;
-    border-radius: 999px; letter-spacing: .06em; }
-  .tag.ok { color: var(--teal); background: var(--teal-soft); border: 1px solid #3e645938; }
-  .tag.watch { color: var(--amber); background: var(--amber-soft); border: 1px solid #8a6d1f38; }
-  .tag.miss { color: var(--red); background: var(--red-soft); border: 1px solid #a63d2f38; }
-
-  /* ---------- 01 learn ---------- */
+  /* 01 learn + group brain */
   .fchips { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
   .flowarr { display: block; margin: .35rem auto; }
-  .flowarr path { stroke: var(--teal); stroke-width: 1.5; fill: none;
-    stroke-dasharray: 6 5; animation: dashmove 1.1s linear infinite; }
+  .flowarr path { stroke: var(--teal); stroke-width: 1.5; fill: none; stroke-dasharray: 6 5; animation: dashmove 1.1s linear infinite; }
   @keyframes dashmove { to { stroke-dashoffset: -11; } }
+  /* the group brain is a box that WRAPS the three venue cards; its border + label draw in last */
+  .groupwrap { border: 1px solid transparent; border-radius: 12px; padding: 0; transition: border-color .55s, background .55s, padding .55s; }
+  .groupwrap.in { border-color: var(--teal); background: var(--teal-soft); padding: .6rem; }
+  .groupwrap .gt { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .55s, opacity .55s, margin .55s; font-weight: 600; font-size: .82rem; color: var(--teal-deep); }
+  .groupwrap.in .gt { max-height: 3rem; opacity: 1; margin: 0 0 .55rem; }
+  .groupwrap .gt .d { color: var(--teal); }
+  .groupwrap .gt .gs { font-family: var(--mono); font-size: .62rem; color: var(--ink-muted); font-weight: 400; }
   .vgrid { display: grid; gap: .55rem; }
-  .vcard { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper);
-    padding: .6rem .75rem; }
+  .vcard { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper); padding: .6rem .75rem; }
   .vcard .n { display: flex; align-items: center; gap: .45rem; font-weight: 600; font-size: .85rem; }
-  .vcard .n .r { margin-left: auto; font-family: var(--mono); font-size: .66rem; font-weight: 400;
-    color: var(--ink-muted); font-variant-numeric: tabular-nums; }
-  .vcard .learned { font-family: var(--mono); font-size: .66rem; color: var(--ink-muted);
-    margin-top: .3rem; }
-  .vdot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); flex: none; }
+  .vcard .n .r { margin-left: auto; font-family: var(--mono); font-size: .64rem; font-weight: 400; color: var(--ink-faint); }
+  .insight { font-family: var(--mono); font-size: .66rem; margin-top: .3rem; min-height: 1.2em; }
+  .insight .replaying { color: var(--ink-faint); }
+  .insight .replaying::after { content: " ▍"; animation: blink 1s step-end infinite; }
+  .insight .learned { display: none; color: var(--ink-muted); }
+  .insight .learned .from { color: var(--ink-faint); }
+  .vcard.resolved { border-color: #3e645938; }
+  .vcard.resolved .insight .replaying { display: none; }
+  .vcard.resolved .insight .learned { display: inline; }
+  .vdot { width: 9px; height: 9px; border-radius: 50%; background: var(--paper-deep); flex: none; transition: background .4s; }
+  .vcard.resolved .vdot { background: var(--teal); }
 
-  /* ---------- 02 refill ---------- */
-  .orows { display: grid; gap: .45rem; }
-  .orow { display: flex; align-items: baseline; gap: .6rem; font-family: var(--mono);
-    font-size: .72rem; color: var(--ink-muted); border-bottom: 1px dashed var(--hairline);
-    padding-bottom: .4rem; transition: background .5s; }
-  .orow b { color: var(--ink); font-weight: 600; }
-  .orow .r { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .osum { display: flex; gap: .5rem; margin-top: .9rem; flex-wrap: wrap; }
+  /* 02 stock levels */
+  .glegend { font-family: var(--mono); font-size: .64rem; color: var(--ink-faint); margin: 0 0 .9rem; }
+  .glist { display: grid; gap: .85rem; }
+  .grow { border-bottom: 1px solid var(--hairline); padding-bottom: .7rem; }
+  .grow:last-child { border-bottom: none; padding-bottom: 0; }
+  .gtop { display: flex; align-items: center; gap: .5rem; margin-bottom: .4rem; }
+  .gname { font-weight: 600; font-size: .88rem; } .gunit { font-family: var(--mono); font-size: .64rem; color: var(--ink-faint); }
+  .gtag { margin-left: auto; font-family: var(--mono); font-size: .6rem; letter-spacing: .04em; padding: .12rem .5rem; border-radius: 999px; }
+  .gtag.lean { color: var(--red); background: var(--red-soft); border: 1px solid #a63d2f38; }
+  .gtag.ok { color: var(--teal); background: var(--teal-soft); border: 1px solid #3e645938; }
+  .gtrack { position: relative; height: 12px; border-radius: 999px; background: var(--paper-deep); overflow: hidden; }
+  .gfill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; width: 0; transition: width 1s cubic-bezier(.2,.7,.2,1) .2s; }
+  .gfill.lean { background: var(--red); } .gfill.ok { background: var(--teal); }
+  .stage.on .gfill[data-w] { width: var(--w); }
+  .gline { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); left: 55%; }
+  .gmeta { font-family: var(--mono); font-size: .66rem; color: var(--ink); font-weight: 600; margin-top: .35rem; font-variant-numeric: tabular-nums; }
+  .gwhy { margin-top: .45rem; }
+  .gwhy summary { font-family: var(--mono); font-size: .64rem; color: var(--teal); cursor: pointer; list-style: none; }
+  .gwhy summary::-webkit-details-marker { display: none; }
+  .gwhy summary::before { content: "▸ "; } .gwhy[open] summary::before { content: "▾ "; }
+  .whygrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin: .5rem 0 .3rem; }
+  .whycell { border: 1px solid var(--hairline); border-radius: 8px; background: var(--paper); padding: .4rem .45rem; text-align: center; }
+  .whycell .k { font-family: var(--mono); font-size: .56rem; letter-spacing: .04em; color: var(--ink-faint); text-transform: uppercase; }
+  .whycell .v { font-family: var(--serif); font-size: 1rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .whycell .u { font-family: var(--mono); font-size: .56rem; color: var(--ink-faint); }
+  .gwhy p { font-family: var(--mono); font-size: .64rem; color: var(--ink-muted); margin: .3rem 0 0; }
 
-  /* the door beat: a realistic invoice drops in, goes into the chat, gets filed —
-     phases stepped by [data-p] on the canvas (paper → read → filed), reset on exit */
-  .doorbeat { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .85rem; }
-  .dlabel { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--ink-faint); margin-bottom: .6rem; }
-  .invpaper { background: #fff; border: 1px solid var(--hairline); border-radius: 4px;
-    box-shadow: 0 2px 6px #26241f1a, 0 14px 28px -18px #26241f4d;
-    padding: .7rem .85rem .6rem; font-family: var(--mono); font-size: .64rem;
-    color: #3a372f; max-width: 19rem; transform: translateY(14px) rotate(-1.6deg);
-    opacity: 0; transition: opacity .5s, transform .5s; }
-  :is([data-p="paper"],[data-p="read"],[data-p="filed"]) .invpaper {
-    opacity: 1; transform: rotate(-1.6deg); }
-  [data-p="read"] .invpaper { border-color: var(--teal); }
-  .invpaper .ih { font-weight: 700; letter-spacing: .06em; color: #26241f; }
-  .invpaper .im { color: #8a8474; margin: .1rem 0 .5rem; border-bottom: 1px solid #eceade;
-    padding-bottom: .35rem; }
-  .invpaper .il { display: flex; justify-content: space-between; gap: 1rem; padding: .12rem 0;
-    font-variant-numeric: tabular-nums; }
-  .invpaper .it { display: flex; justify-content: space-between; gap: 1rem; margin-top: .35rem;
-    border-top: 1px solid #eceade; padding-top: .3rem; font-weight: 700; color: #26241f;
-    font-variant-numeric: tabular-nums; }
-  .decho { margin: .7rem 0 0 auto; width: fit-content; max-width: 100%;
-    background: var(--teal); color: var(--card); font-size: .78rem;
-    border-radius: 13px 13px 4px 13px; padding: .42rem .85rem;
-    opacity: 0; transform: translateY(6px); transition: opacity .45s, transform .45s; }
-  :is([data-p="read"],[data-p="filed"]) .decho { opacity: 1; transform: none; }
-  .decho .reading { display: inline; }
-  .decho .done { display: none; }
-  [data-p="filed"] .decho .reading { display: none; }
-  [data-p="filed"] .decho .done { display: inline; }
-  [data-p="filed"] .orow.beer { background: var(--teal-soft); }
+  /* 03 orders + amend */
+  .orows { display: grid; gap: .4rem; }
+  .orow { display: flex; align-items: baseline; gap: .6rem; font-family: var(--mono); font-size: .72rem; color: var(--ink-muted); border-bottom: 1px dashed var(--hairline); padding-bottom: .35rem; }
+  .orow b { color: var(--ink); font-weight: 600; } .orow .r { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .supexp { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .5s, opacity .5s, margin .5s;
+    border: 1px solid #3e645938; border-radius: 10px; background: var(--paper); padding: 0 .6rem; margin: 0; }
+  :is([data-o="open"],[data-o="amended"]) .supexp { max-height: 12rem; opacity: 1; padding: .5rem .6rem; margin: .55rem 0 .2rem; }
+  .supexp .sh { font-family: var(--mono); font-size: .6rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .1rem; }
+  .oline { display: flex; align-items: center; gap: .5rem; font-family: var(--mono); font-size: .7rem; padding: .4rem 0; border-top: 1px dashed var(--hairline); }
+  .oline:first-of-type { border-top: none; }
+  .oline .onm { font-weight: 600; color: var(--ink); } .oline .oqt { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .amchip { margin-left: auto; font-family: var(--mono); font-size: .62rem; color: var(--teal); border: 1px solid #3e645938; border-radius: 999px; padding: .12rem .5rem; background: var(--teal-soft); }
+  .stepper { margin-left: auto; display: inline-flex; align-items: center; gap: .55rem; border: 1px solid var(--teal); border-radius: 8px; padding: .1rem .45rem; }
+  .stepper span.b { color: var(--teal); font-size: 1rem; line-height: 1; }
+  .stepper .sv { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; min-width: 1.4rem; text-align: center; transition: color .2s; }
+  [data-o="amended"] .stepper .sv { color: var(--teal); }
+  .amended { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .4s, opacity .4s, margin .4s; font-family: var(--mono); font-size: .6rem; color: var(--teal); }
+  [data-o="amended"] .amended { max-height: 3rem; opacity: 1; margin-top: .35rem; }
+  .whostrip { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; margin: .9rem 0 .2rem; }
+  .whostrip .wl { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  .vschip { font-family: var(--mono); font-size: .68rem; padding: .26rem .55rem; border-radius: 999px; background: var(--paper); border: 1px solid var(--hairline); color: var(--ink-muted); }
+  .vschip b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .approve { font-family: var(--mono); font-size: .76rem; border: none; border-radius: 10px; background: var(--teal); color: #fdfbf6; padding: .6rem .9rem; width: 100%; margin-top: 1rem; text-align: center; }
 
-  /* ---------- 03 doubt ---------- */
-  .dcols { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
-  @media (max-width: 420px) { .dcols { grid-template-columns: 1fr; } }
-  .dcol { border: 1px solid var(--hairline); border-radius: 10px; background: var(--paper);
-    padding: .55rem .65rem; }
-  .dcol .h { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
-    text-transform: uppercase; color: var(--ink-faint); margin-bottom: .45rem; }
-  .ditem { font-size: .78rem; padding: .3rem 0; border-bottom: 1px dashed var(--hairline); }
-  .ditem:last-child { border-bottom: none; }
-  .ditem .m { display: block; font-family: var(--mono); font-size: .64rem; color: var(--ink-muted);
-    font-variant-numeric: tabular-nums; }
-  .ditem .m b { color: var(--red); font-weight: 600; }
-
-  /* ---------- 04 ask (the pill) ---------- */
-  .pillbox { max-width: 22rem; margin: 0 auto; }
-  .pillq { font-family: var(--serif); font-size: 1.08rem; margin: .5rem 0 .8rem; min-height: 3.2em; }
-  .fcaret { display: inline-block; width: 1px; height: 1em; background: currentColor;
-    vertical-align: -.12em; animation: blink 1s step-end infinite; }
+  /* pill (04) */
+  .pwho { display: flex; align-items: center; gap: .45rem; font-family: var(--mono); font-size: .7rem; color: var(--ink-muted); margin-bottom: .55rem; }
+  .pwho b { color: var(--ink); }
+  .pq { font-family: var(--serif); font-size: 1rem; margin: 0 0 .7rem; min-height: 2.6em; }
+  .pcaret { display: inline-block; width: 1px; height: 1em; background: currentColor; vertical-align: -.12em; animation: blink 1s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .fakein { display: flex; gap: .5rem; }
-  .fakein .field { flex: 1; border: 1px solid var(--hairline); border-radius: 9px;
-    padding: .5rem .7rem; font-family: var(--mono); font-size: .8rem; color: var(--ink);
-    background: var(--paper); min-height: 2.2rem; }
-  .fakein .send { font-family: var(--mono); font-size: .74rem; border: none; border-radius: 9px;
-    background: var(--teal); color: #fdfbf6; padding: .5rem .9rem; }
-  .pillnote { font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); margin-top: .8rem; }
-  .pillnote b { color: var(--ink); }
+  .ptag { display: inline-block; font-family: var(--mono); font-size: .58rem; letter-spacing: .05em; padding: .1rem .42rem; border-radius: 999px; background: var(--teal-soft); color: var(--teal); border: 1px solid #3e645938; margin-right: .35rem; }
+  .onroad { font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); border: 1px solid var(--hairline); border-radius: 9px; background: var(--paper); padding: .45rem .6rem; margin-bottom: .7rem; }
+  .invpaper { background: #fff; border: 1px solid var(--hairline); border-radius: 4px; box-shadow: 0 2px 6px #26241f1a, 0 14px 28px -18px #26241f4d; padding: .7rem .85rem .6rem; font-family: var(--mono); font-size: .62rem; color: #3a372f; transform: translateY(14px) rotate(-1.4deg); opacity: 0; transition: opacity .5s, transform .5s; margin-bottom: .7rem; }
+  :is([data-p="reading"],[data-p="read"],[data-p="filed"]) .invpaper { opacity: 1; transform: rotate(-1.4deg); }
+  [data-p="reading"] .invpaper { border-color: var(--teal); }
+  .invpaper .ih { font-weight: 700; letter-spacing: .05em; color: #26241f; }
+  .invpaper .im { color: #8a8474; margin: .1rem 0 .45rem; border-bottom: 1px solid #eceade; padding-bottom: .3rem; }
+  .invpaper .il { display: flex; justify-content: space-between; gap: 1rem; padding: .1rem 0; font-variant-numeric: tabular-nums; }
+  .invpaper .it { display: flex; justify-content: space-between; gap: 1rem; margin-top: .3rem; border-top: 1px solid #eceade; padding-top: .28rem; font-weight: 700; color: #26241f; font-variant-numeric: tabular-nums; }
+  .btnfake { font-family: var(--mono); font-size: .74rem; border: none; border-radius: 9px; background: var(--teal); color: #fdfbf6; padding: .55rem .9rem; width: 100%; text-align: center; display: none; }
+  [data-p="idle"] .btnfake, [data-p="open"] .btnfake { display: block; }
+  .readnote { font-family: var(--mono); font-size: .68rem; color: var(--teal); margin: 0 0 .5rem; display: none; }
+  [data-p="reading"] .readnote { display: block; }
+  .extract { opacity: 0; transform: translateY(6px); transition: opacity .45s, transform .45s; }
+  :is([data-p="read"],[data-p="filed"]) .extract { opacity: 1; transform: none; }
+  :is([data-p="idle"],[data-p="open"],[data-p="reading"]) .extract { display: none; }
+  .echo { font-family: var(--serif); font-size: .92rem; margin: 0 0 .55rem; }
+  .pchips { display: grid; gap: .35rem; }
+  .pchip { font-family: var(--mono); font-size: .66rem; color: var(--ink); background: var(--paper); border: 1px solid var(--hairline); border-radius: 8px; padding: .34rem .5rem; font-variant-numeric: tabular-nums; }
+  .pbye { font-family: var(--mono); font-size: .7rem; color: var(--teal); margin: .6rem 0 0; display: none; }
+  [data-p="filed"] .pbye { display: block; }
 
-  /* ---------- 05 recap ---------- */
-  .rsay { font-family: var(--serif); font-size: 1.02rem; margin: .4rem 0 .6rem; }
-  .rsay b { font-variant-numeric: tabular-nums; }
-  .rreply { margin: .6rem 0 0 auto; width: fit-content; background: var(--teal); color: var(--card);
-    font-style: italic; font-size: .84rem; border-radius: 13px 13px 4px 13px; padding: .4rem .85rem; }
-  .rfiled { margin-top: .6rem; font-family: var(--mono); font-size: .68rem; color: var(--ink-muted); }
-  .meter { margin: .9rem 0 .4rem; }
-  .meter .lbl { display: flex; justify-content: space-between; font-family: var(--mono);
-    font-size: .66rem; color: var(--ink-muted); margin-bottom: .35rem; }
-  .meter .bar { height: 10px; border-radius: 999px; background: var(--paper-deep); overflow: hidden; }
-  .meter .fill { height: 100%; width: 0; border-radius: 999px; background: var(--teal);
-    transition: width 1.1s cubic-bezier(.2,.7,.2,1) .3s; }
-  .stage.on .meter .fill { width: 92.3%; }
-  .bignum { font-family: var(--serif); font-size: 1.9rem; font-variant-numeric: tabular-nums; }
-  .missrow { margin-top: .7rem; border-left: 3px solid var(--red); background: var(--red-soft);
-    border-radius: 0 10px 10px 0; padding: .5rem .7rem; font-size: .78rem; color: var(--ink-muted); }
-  .missrow b { color: var(--ink); font-variant-numeric: tabular-nums; }
-  .rcsep { margin-top: 1rem; border-top: 1px solid var(--hairline); padding-top: .7rem;
-    font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--ink-faint); }
+  /* 05 doubt queue → check → thanks */
+  .qrow { display: flex; align-items: center; gap: .5rem; padding: .55rem .6rem; border: 1px solid var(--hairline); border-radius: 9px; background: var(--paper); margin-bottom: .45rem; transition: border-color .3s, background .3s; }
+  .qname { font-weight: 600; font-size: .84rem; }
+  .qright { margin-left: auto; display: flex; align-items: center; gap: .7rem; }
+  .qmeta { font-family: var(--mono); font-size: .64rem; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+  .qmeta .risk { color: var(--ink); font-weight: 600; }
+  #doubtcanvas[data-d]:not([data-d="idle"]) #pattyrow { border-color: var(--teal); background: var(--teal-soft); }
+  .qstat { font-family: var(--mono); font-size: .64rem; font-weight: 600; color: var(--teal); white-space: nowrap; }
+  /* the pill opens below the queue: doubt → sent → pill opens → reply → thanks */
+  .pillopen { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .55s, opacity .55s, margin .55s, padding .55s;
+    border-top: 1px dashed transparent; margin: 0; padding: 0; }
+  :is([data-d="pill"],[data-d="reply"],[data-d="done"]) .pillopen { max-height: 18rem; opacity: 1; border-top-color: var(--hairline); margin-top: .85rem; padding-top: .85rem; }
+  .pq2 { font-family: var(--serif); font-size: .98rem; margin: 0 0 .6rem; }
+  .pq2 b { font-variant-numeric: tabular-nums; }
+  .pillans { display: none; margin-bottom: .55rem; }
+  :is([data-d="reply"],[data-d="done"]) .pillans { display: block; }
+  .pillthanks { display: none; font-family: var(--mono); font-size: .72rem; color: var(--teal); margin: 0; }
+  [data-d="done"] .pillthanks { display: block; }
+  .pillthanks b { color: var(--ink); font-variant-numeric: tabular-nums; }
 
-  /* ---------- honesty + footer ---------- */
-  .honest { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 3rem; }
+  /* 06 recap — question, reply, one note filed */
+  .r6 { opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s; }
+  .r6.in { opacity: 1; transform: none; }
+  .bubble { max-width: 82%; width: fit-content; padding: .5rem .75rem; border-radius: 13px; font-size: .86rem; margin-bottom: .55rem; }
+  .bubble.you { margin-left: auto; background: var(--teal); color: var(--card); border-bottom-right-radius: 4px; }
+  .bubble.brain { background: var(--paper); border: 1px solid var(--hairline); color: var(--ink); border-bottom-left-radius: 4px; }
+  .bubble.brain b { font-variant-numeric: tabular-nums; }
+  .adaptbox { border: 1px solid #3e645938; background: var(--teal-soft); border-radius: 10px; padding: .6rem .7rem; margin-top: .4rem; }
+  .adaptbox .al { font-family: var(--mono); font-size: .58rem; letter-spacing: .06em; text-transform: uppercase; color: var(--teal); }
+  .adaptrow { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: .82rem; margin-top: .45rem; }
+  .adaptrow .ak { color: var(--ink-muted); }
+  .adaptrow .av { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; white-space: nowrap; }
+  .adaptrow .up { color: var(--teal); font-size: .74rem; }
+  /* the recap reply as a voice note: mic + waveform → transcription */
+  .bubble.voice { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .7rem; }
+  .wave { display: inline-flex; align-items: center; gap: 2px; height: 15px; }
+  .wave i { width: 2px; height: 100%; background: currentColor; border-radius: 1px; transform-origin: center; animation: wv .9s ease-in-out infinite; animation-delay: var(--d); }
+  @keyframes wv { 0%, 100% { transform: scaleY(.28); } 50% { transform: scaleY(1); } }
+  .vdur { font-family: var(--mono); font-size: .64rem; opacity: .85; }
+  .transcript { font-family: var(--mono); font-size: .74rem; color: var(--ink-muted); margin: 0 0 .55rem; }
+  .transcript .tl { color: var(--ink-faint); }
+
+  .honest { max-width: 660px; margin: 0 auto; padding: 4rem 2rem 3rem; }
   .honest h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; }
   .honest ul { color: var(--ink-muted); font-size: .92rem; padding-left: 1.1rem; }
-  .honest li { margin: .45rem 0; }
-  .honest li b { color: var(--ink); }
+  .honest li { margin: .45rem 0; } .honest li b { color: var(--ink); }
   footer { text-align: center; padding: 3.5rem 1.5rem 4.5rem; }
-  footer .cta { margin-top: 1.2rem; }
-  footer p { color: var(--ink-muted); font-size: .9rem; max-width: 46ch; margin: .6rem auto; }
+  footer .btn { font-family: var(--mono); font-size: .78rem; text-decoration: none; padding: .62rem 1.05rem; border-radius: 10px; border: 1px solid var(--hairline); color: var(--ink); background: var(--card); display: inline-block; }
+  footer p { color: var(--ink-muted); font-size: .9rem; max-width: 48ch; margin: .6rem auto; }
 </style>
 </head>
 <body>
@@ -235,42 +235,40 @@
 <header class="hero stage" id="hero">
   <p class="eyebrow">roger brain · a working demo</p>
   <h1>An operations brain that grades its own work.</h1>
-  <p class="sub">It learns each venue from data it already has, drafts the orders, doubts its own
-    books out loud, asks the floor one question a day — and then checks its predictions against
-    reality and publishes the score. Built for independent restaurant groups.</p>
-  <div class="cta">
-    <span class="cap">the live app on Railway — fictional venue, real engine output</span>
-  </div>
-  <p class="hint">scroll — five moments ↓</p>
+  <p class="thesis">Plain where you work. The math in one room.</p>
+  <p class="sub">One brain per venue, learned from files you already have. It keeps your stock levels,
+    drafts the supplier orders, reads the invoice at the door, and runs the floor on two plain pills —
+    then recaps the day and learns from what you tell it. Built for independent restaurant groups.</p>
+  <div class="cta"><span class="cap">a fictional venue, "Burger House" · every figure is real engine output</span></div>
+  <p class="hint">scroll — six moments ↓</p>
 </header>
 
-<!-- ============ 01 · LEARN ============ -->
+<!-- 01 LEARN -->
 <section class="row" id="m1">
   <div class="stagecell">
-    <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>Burger House</b> · onboarding
-        <span class="right">replaying your history</span></div>
-      <div class="canvas">
-        <div class="fchips" data-r="1">
-          <span class="chip">sales · POS export</span>
-          <span class="chip">counts · excel</span>
-          <span class="chip">invoices · pdf</span>
-        </div>
-        <svg class="flowarr" data-r="2" width="24" height="34" viewBox="0 0 24 34" aria-hidden="true">
-          <path d="M12 2 L12 26 M5 20 L12 27 L19 20"/>
-        </svg>
-        <div class="vgrid">
-          <div class="vcard" data-r="3">
-            <div class="n"><span class="vdot"></span>Downtown<span class="r">31 days replayed</span></div>
-            <div class="learned">learned: even weekday demand — no skew worth correcting for</div>
-          </div>
-          <div class="vcard" data-r="4">
-            <div class="n"><span class="vdot"></span>Riverside<span class="r">31 days replayed</span></div>
-            <div class="learned">learned: Sat +5% vs a flat week · lunch-led, peak 12:00</div>
-          </div>
-          <div class="vcard" data-r="5">
-            <div class="n"><span class="vdot"></span>Beach<span class="r">31 days replayed</span></div>
-            <div class="learned">learned: Sun +10%, Tue +3% — its own rhythm, its own pars</div>
+    <div class="stage frame" data-stage="learn">
+      <div class="chrome"><span class="dot"></span><b>Burger House</b> · onboarding<span class="right">learning your venues…</span></div>
+      <div class="canvas" id="learncanvas">
+        <div class="fchips" data-r="1"><span class="chip">sales · POS export</span><span class="chip">counts · excel</span><span class="chip">invoices · pdf</span></div>
+        <svg class="flowarr" data-r="2" width="24" height="34" viewBox="0 0 24 34" aria-hidden="true"><path d="M12 2 L12 26 M5 20 L12 27 L19 20"/></svg>
+        <div class="groupwrap" id="groupbox">
+          <div class="gt"><span class="d">◆</span> Group brain — over all three · <span class="gs">shares pars, prices &amp; your corrections</span></div>
+          <div class="vgrid">
+            <div class="vcard" data-v="1">
+              <div class="n"><span class="vdot"></span>Downtown<span class="r">31 days</span></div>
+              <div class="insight"><span class="replaying">learning its rhythm</span>
+                <span class="learned">even weekday demand — no skew worth correcting<span class="from"> · drives its forecast</span></span></div>
+            </div>
+            <div class="vcard" data-v="2">
+              <div class="n"><span class="vdot"></span>Riverside<span class="r">31 days</span></div>
+              <div class="insight"><span class="replaying">learning its rhythm</span>
+                <span class="learned">Sat +5% vs a flat week · lunch-led, peak 12:00<span class="from"> · drives its pars</span></span></div>
+            </div>
+            <div class="vcard" data-v="3">
+              <div class="n"><span class="vdot"></span>Beach<span class="r">31 days</span></div>
+              <div class="insight"><span class="replaying">learning its rhythm</span>
+                <span class="learned">Sun +10%, Tue +3% — its own rhythm, its own pars<span class="from"> · drives its forecast</span></span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -278,260 +276,354 @@
   </div>
   <div class="txt">
     <p class="kicker">01 · learn</p>
-    <h2>It starts with files you already have.</h2>
-    <p>No forms, no data entry project. Sales exports, count sheets and supplier invoices are
-      replayed into one brain per venue — and the venues genuinely diverge: one runs flat all
-      week, the next peaks Saturdays, the third Sundays. Each learns its own rhythm; the group
-      brain sits over all three.</p>
-    <p class="fine">the learned patterns are inspectable in the app — every one names the data
-      it was learned from and what it drives.</p>
+    <h2>It learns each venue — then a group brain sits over them.</h2>
+    <p>No forms, no data-entry project. Sales exports, count sheets and supplier invoices are replayed
+      into one brain per venue — and the venues genuinely diverge: Downtown runs flat all week,
+      Riverside peaks Saturdays at lunch, Beach leans Sunday. Each learns its own rhythm.</p>
+    <p>Above them, a group brain shares what should be shared — pars, prices, the corrections you make —
+      without flattening the differences each site earned.</p>
+    <p class="fine">every learned pattern names the data it came from and what it drives — nothing here
+      is a claim the data can't back.</p>
   </div>
 </section>
 
-<!-- ============ 02 · REFILL ============ -->
+<!-- 02 STOCK LEVELS -->
 <section class="row flip" id="m2">
   <div class="txt">
-    <p class="kicker">02 · refill</p>
-    <h2>Orders start from the forecast. You keep the OK.</h2>
-    <p>Every night: forecast tomorrow's demand from the learned rhythm, subtract what's on hand,
-      respect pack sizes, price each line from the latest invoice actually paid. The draft lands
-      consolidated per supplier; you amend or approve — and every amend is a correction the
-      brain learns from. When the delivery lands, the invoice is photographed at the door, read
-      line-by-line, and the prices feed the next draft.</p>
-    <p class="fine">approve is idempotent — a double-tap can never order twice. the invoice echo
-      is verbatim: what the brain read is what you see.</p>
+    <p class="kicker">02 · stock levels</p>
+    <h2>It keeps Downtown's levels — and flags what's running lean.</h2>
+    <p>What's on the book against the level this venue's own demand justifies. That level isn't a flat
+      par you typed once: it's set from how much the item actually <b>swings</b> day to day — a steady
+      item sits tight to its usage, a jumpy one carries more margin.</p>
+    <p>The bar and its line say it at a glance; the reasoning is one tap away. Open <i>why this level</i>
+      and the brain shows its work — how erratic the item is, and how many days it learned from.</p>
+    <p class="fine">the level re-learns as the venue's demand moves — it isn't a number anyone re-types.</p>
+  </div>
+  <div class="stagecell">
+    <div class="stage frame">
+      <div class="chrome"><span class="dot"></span><b>Downtown</b> · stock levels<span class="right">2 running lean</span></div>
+      <div class="canvas">
+        <p class="glegend">the line is the level Downtown's demand justifies · a bar short of it is running lean</p>
+        <div class="glist">
+          <div class="grow" data-r="1">
+            <div class="gtop"><span class="gname">Beef patty (165g)</span> <span class="gunit">each</span><span class="gtag lean">running lean</span></div>
+            <div class="gtrack" role="img" aria-label="beef patty below its level"><div class="gfill lean" data-w style="--w:51%"></div><div class="gline"></div></div>
+            <div class="gmeta">have 388 each</div>
+            <details class="gwhy">
+              <summary>why this level</summary>
+              <div class="whygrid">
+                <div class="whycell"><div class="k">how erratic</div><div class="v">±34</div><div class="u">each/day</div></div>
+                <div class="whycell"><div class="k">evidence</div><div class="v">31</div><div class="u">days</div></div>
+                <div class="whycell"><div class="k">needs</div><div class="v">≈420</div><div class="u">on hand</div></div>
+              </div>
+              <p>Set from Downtown's own daily swings (±34 each) over 31 days — a steadier item would sit tighter to its usage.</p>
+            </details>
+          </div>
+          <div class="grow" data-r="2">
+            <div class="gtop"><span class="gname">Burger bun</span> <span class="gunit">each</span><span class="gtag lean">running lean</span></div>
+            <div class="gtrack" role="img" aria-label="burger bun below its level"><div class="gfill lean" data-w style="--w:41%"></div><div class="gline"></div></div>
+            <div class="gmeta">have 156 each</div>
+          </div>
+          <div class="grow" data-r="3">
+            <div class="gtop"><span class="gname">Dois Corvos Pilsner 33cl</span> <span class="gunit">each</span><span class="gtag ok">ok</span></div>
+            <div class="gtrack" role="img" aria-label="pilsner above its level"><div class="gfill ok" data-w style="--w:73%"></div><div class="gline"></div></div>
+            <div class="gmeta">have 96 each</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ORDERS -->
+<section class="row" id="m3">
+  <div class="stagecell">
+    <div class="stage frame" data-stage="order">
+      <div class="chrome"><span class="dot"></span><b>tonight's draft</b><span class="right">38 lines · 5 suppliers</span></div>
+      <div class="canvas" id="ordercanvas" data-o="idle">
+        <div class="orows"><div class="orow" data-r="1"><b>Makro</b><span class="r">22 lines</span></div></div>
+        <div class="supexp">
+          <div class="sh">Makro — change any line before it sends</div>
+          <div class="oline">
+            <span class="onm">Beef patty (165g)</span><span class="oqt">× case</span>
+            <span class="stepper"><span class="b">−</span><span class="sv" id="beefqty">12</span><span class="b">+</span></span>
+          </div>
+          <div class="oline"><span class="onm">Burger bun</span><span class="oqt">6 × case</span><span class="amchip">amend</span></div>
+          <p class="amended">amended beef 12 → 14 · logged as a correction — the brain drafts closer next time</p>
+        </div>
+        <div class="orows">
+          <div class="orow" data-r="3"><b>Frutas do Mercado</b><span class="r">11 lines</span></div>
+          <div class="orow" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
+          <div class="orow" data-r="4"><b>Padaria do Bairro · Talho Central</b><span class="r">2 lines</span></div>
+        </div>
+        <div class="whostrip" data-r="5"><span class="wl">who needs it</span>
+          <span class="vschip">Downtown <b>€612</b></span><span class="vschip">Beach <b>€433</b></span><span class="vschip">Riverside <b>€388</b></span></div>
+        <button class="approve" type="button" tabindex="-1" aria-hidden="true" data-r="5">Approve &amp; send · 38 lines</button>
+      </div>
+    </div>
+  </div>
+  <div class="txt">
+    <p class="kicker">03 · orders</p>
+    <h2>The order follows the levels — you keep the OK.</h2>
+    <p>The lean items set tonight's draft. The brain forecasts tomorrow, subtracts what's on hand,
+      respects pack sizes and prices each line from the last invoice actually paid — then lands it
+      consolidated per supplier, with a "who needs it" strip so you see which site drives the spend.</p>
+    <p>Change any line right there — bump the beef, drop a line — then approve. Nothing sends without
+      you, and every change is logged so the next draft comes back closer to your call.</p>
+    <p class="fine">approve is idempotent — a double-tap can never place the order twice.</p>
+  </div>
+</section>
+
+<!-- 04 READS THE INVOICE -->
+<section class="row flip" id="m4">
+  <div class="txt">
+    <p class="kicker">04 · the door · a pill</p>
+    <h2>When the delivery lands, the door reads its own invoice.</h2>
+    <p>Nobody types it in. The receiving pill — the same one-thing-at-a-time surface the floor uses —
+      asks one thing: <i>photo the invoice</i>. It reads the lines, echoes back exactly what it read,
+      and files the prices straight onto the books, ready to price the next draft.</p>
+    <p class="fine">the echo is verbatim: what the brain read is what you see. if it can't read a line
+      it says so and prices nothing — it never invents a number. →&nbsp;watch it read ↓</p>
   </div>
   <div class="stagecell">
     <div class="stage frame" data-stage="door">
-      <div class="chrome"><span class="dot"></span><b>tonight's draft</b>
-        <span class="right">38 lines · 5 suppliers</span></div>
-      <div class="canvas" id="doorcanvas">
-        <div class="orows">
-          <div class="orow" data-r="1"><b>Makro</b><span class="r">22 lines</span></div>
-          <div class="orow" data-r="2"><b>Frutas do Mercado</b><span class="r">11 lines</span></div>
-          <div class="orow beer" data-r="3"><b>Dois Corvos</b><span class="r">3 lines</span></div>
-          <div class="orow" data-r="4"><b>Padaria do Bairro</b><span class="r">1 line</span></div>
-          <div class="orow" data-r="5"><b>Talho Central</b><span class="r">1 line</span></div>
+      <div class="chrome"><span class="dot"></span>Burger House · back door<span class="right">2026-05-31</span></div>
+      <div class="canvas" id="doorcanvas" data-p="idle">
+        <div class="pwho"><span class="dot"></span><b>the brain</b> · receiving</div>
+        <p class="pq"><span id="doorq"></span><span class="pcaret" id="doorcaret"></span></p>
+        <div class="onroad" data-r="2"><span class="ptag">on the road</span>Dois Corvos · 3 lines · sent 29 May</div>
+        <div class="invpaper" aria-hidden="true">
+          <div class="ih">DOIS CORVOS — CERVEJEIRA</div>
+          <div class="im">fatura · 31 May 2026 · Burger House</div>
+          <div class="il"><span>IPA 33cl · 7 case × €33.60</span><span>€235.20</span></div>
+          <div class="il"><span>Pilsner 33cl · 11 case × €28.80</span><span>€316.80</span></div>
+          <div class="il"><span>Session IPA 33cl · 7 case × €31.20</span><span>€218.40</span></div>
+          <div class="it"><span>TOTAL</span><span>€770.40</span></div>
         </div>
-        <div class="doorbeat">
-          <p class="dlabel" data-r="5">…two days later, at the back door</p>
-          <div class="invpaper" aria-hidden="true">
-            <div class="ih">DOIS CORVOS — CERVEJEIRA</div>
-            <div class="im">fatura · 31 May 2026 · Burger House</div>
-            <div class="il"><span>IPA 33cl · 7 case × €33.60</span><span>€235.20</span></div>
-            <div class="il"><span>Pilsner 33cl · 11 case × €28.80</span><span>€316.80</span></div>
-            <div class="il"><span>Session IPA 33cl · 7 case × €31.20</span><span>€218.40</span></div>
-            <div class="it"><span>TOTAL</span><span>€770.40</span></div>
+        <p class="readnote" role="status">reading the invoice…</p>
+        <button class="btnfake" type="button" tabindex="-1" aria-hidden="true">photo / upload the invoice</button>
+        <div class="extract">
+          <p class="echo">invoice from Dois Corvos · 31 May 2026 · 3 lines · €770.40. this is what I read —</p>
+          <div class="pchips">
+            <div class="pchip">IPA 33cl · 7 × €33.60 = €235.20</div>
+            <div class="pchip">Pilsner 33cl · 11 × €28.80 = €316.80</div>
+            <div class="pchip">Session IPA 33cl · 7 × €31.20 = €218.40</div>
           </div>
-          <p class="decho" role="status">
-            <span class="reading">reading the invoice…</span>
-            <span class="done">read 3 lines · €770.40 — filed ✓ prices on the books</span>
-          </p>
+          <p class="pbye">filed ✓ — prices updated. they price the next draft.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 03 · DOUBT ============ -->
-<section class="row" id="m3">
-  <div class="stagecell">
-    <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>what the brain doubts</b>
-        <span class="right">per venue · € at risk × staleness</span></div>
-      <div class="canvas">
-        <div class="dcols">
-          <div class="dcol" data-r="1">
-            <div class="h">Downtown — its own queue</div>
-            <div class="ditem">Beef patty (165g)
-              <span class="m"><b>€192.17</b> at risk · never counted here</span></div>
-            <div class="ditem">Burger bun
-              <span class="m"><b>€49.76</b> at risk · never counted here</span></div>
-            <div class="ditem">Dois Corvos Pilsner 33cl
-              <span class="m"><b>€28.20</b> at risk · never counted here</span></div>
-          </div>
-          <div class="dcol" data-r="2">
-            <div class="h">Beach — a different bet</div>
-            <div class="ditem">Beef patty (165g)
-              <span class="m"><b>€135.71</b> at risk · never counted here</span></div>
-            <div class="ditem">Burger bun
-              <span class="m"><b>€35.12</b> at risk · never counted here</span></div>
-            <div class="ditem">Dois Corvos Pilsner 33cl
-              <span class="m"><b>€19.93</b> at risk · never counted here</span></div>
-          </div>
-        </div>
-        <div class="osum" data-r="3">
-          <span class="chip">its sales set the € at risk</span>
-          <span class="chip">its counts reset the clock</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="txt">
-    <p class="kicker">03 · doubt</p>
-    <h2>It doubts its own books — item by item, venue by venue.</h2>
-    <p>Derived stock is a claim, not a fact — so the brain scores its own uncertainty per
-      ingredient: money at stake × time since a human confirmed × how erratically the item
-      moves. Each venue gets its own queue, priced by its own sales — Downtown's beef-patty
-      exposure is €192, Beach's €136 — and a count at one venue never silences doubt at
-      another.</p>
-    <p class="fine">this ranking is what decides the ONE question the floor gets asked (next
-      moment). answered items leave the queue; the rest re-rank.</p>
-  </div>
-</section>
-
-<!-- ============ 04 · ASK ============ -->
-<section class="row flip" id="m4">
-  <div class="txt">
-    <p class="kicker">04 · ask</p>
-    <h2>Front of house sees one question. That's the whole app.</h2>
-    <p>Nobody on the floor opens a dashboard. A quiet pill sits in the corner; when the brain's
-      doubt crosses a line, it asks one thing — typed out like a person, answered with a number
-      or a voice note. The answer corrects the books, grades the brain's own derivation, and
-      the pill recedes.</p>
-    <p class="fine">5 open questions across 38 tracked items in the demo world — answer one and
-      watch the count drop. fewer questions every month is the point.</p>
-  </div>
-  <div class="stagecell">
-    <div class="stage frame pillbox" data-stage="pill">
-      <div class="chrome"><span class="dot"></span><b>the brain</b>
-        <span class="right">Burger House · 2026-05-31</span></div>
-      <div class="canvas">
-        <p class="pillq"><span id="typeq"></span><span class="fcaret" id="caret"></span></p>
-        <div class="fakein" data-r="2" aria-hidden="true">
-          <div class="field" id="typea"></div><div class="send">Send</div>
-        </div>
-        <p class="pillnote" data-r="3">thanks — I had <b>388</b> on the books, you counted <b>412</b>.
-          off by 24 — corrected.</p>
-        <p class="pillnote" data-r="4" style="color:var(--ink-faint)">— a question a day or two ·
-          fewer as it learns —</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 05 · RECAP ============ -->
+<!-- 05 SPOT-CHECKS -->
 <section class="row" id="m5">
   <div class="stagecell">
-    <div class="stage frame">
-      <div class="chrome"><span class="dot"></span><b>the brain</b> · day recap
-        <span class="right">at close</span></div>
-      <div class="canvas">
-        <p class="rsay" data-r="1">yesterday landed <b>inside my band</b> — €4,156 called,
-          €4,228 real. anything I should know before I set tomorrow up?</p>
-        <p class="rreply" data-r="2">waste 2 each burger bun</p>
-        <p class="rfiled" data-r="2"><span class="tag ok">filed</span> waste · Burger bun · 2 each</p>
-        <p class="rcsep" data-r="3">and over the month — the report card</p>
-        <div class="meter" data-r="3">
-          <div class="lbl"><span>band coverage — target 80%</span><span><b>12 / 13 in band</b></span></div>
-          <div class="bar"><div class="fill"></div></div>
+    <div class="stage frame" data-stage="doubt">
+      <div class="chrome"><span class="dot"></span><b>what the brain doubts</b> · Downtown<span class="right">ranked · € at risk × time</span></div>
+      <div class="canvas" id="doubtcanvas" data-d="idle">
+        <div class="qrow" id="pattyrow" data-r="1">
+          <span class="qname">Beef patty (165g)</span>
+          <span class="qright"><span class="qmeta"><span class="risk">€192 at risk</span> · 4 days</span><span class="qstat" id="pattystat" aria-live="polite"></span></span>
         </div>
-        <p data-r="4" style="margin:.2rem 0 0">
-          <span class="bignum">92%</span>
-          <span class="tag watch" style="margin-left:.5rem">small n · says so on the page</span>
-        </p>
-        <div class="missrow" data-r="5"><span class="tag miss">headline miss</span>&nbsp;
-          May 24 — called <b>€6,493</b>, band €5,425–7,562, reality <b>€7,622</b>. outside the
-          band, on the record.</div>
+        <div class="qrow" data-r="2"><span class="qname">Burger bun</span>
+          <span class="qright"><span class="qmeta"><span class="risk">€50 at risk</span> · 6 days</span></span></div>
+        <div class="qrow" data-r="3"><span class="qname">Dois Corvos Pilsner 33cl</span>
+          <span class="qright"><span class="qmeta"><span class="risk">€28 at risk</span> · never counted</span></span></div>
+        <div class="pillopen">
+          <div class="pwho"><span class="dot"></span><b>the brain</b> · on the floor's pill</div>
+          <p class="pq2">Quick check — how many <b>Beef patty (165g)</b> do you count right now?</p>
+          <div class="bubble you pillans">412</div>
+          <p class="pillthanks">thanks — books were off by 24, now <b>updated ✓</b></p>
+        </div>
       </div>
     </div>
   </div>
   <div class="txt">
-    <p class="kicker">05 · recap</p>
-    <h2>At close, it tells you what it got wrong — and files what you tell it.</h2>
-    <p>The evening dialogue closes the loop: the brain owns its day out loud — inside or outside
-      its own band — and asks what it couldn't see. A waste line or a correction typed back is
-      parsed and filed, not lost in a chat log. And every graded call lands on a decision ledger
-      (27 in the demo world: forecasts, drift flags, spot-checks, an order draft) that a replay
-      harness turns into a published report card — worst miss as the headline.</p>
-    <p class="fine">n is small and the page says so — 13 banded forecasts is a calibration
-      baseline, not a brag. the discipline is the product; the number just has to be honest.</p>
+    <p class="kicker">05 · the floor · a pill</p>
+    <h2>It spot-checks itself — starting where doubt is highest.</h2>
+    <p>Derived stock is a claim, not a fact — so the brain ranks its own uncertainty per item: money
+      at stake × how long since anyone actually counted it. The top of the queue becomes one quick
+      question on the floor's pill — a number back, and it corrects itself.</p>
+    <p class="fine">it starts with the item it doubts most, then works down. answer one and it leaves the
+      queue — fewer questions as it learns. no dashboard, one thing at a time.</p>
   </div>
 </section>
 
-<!-- ============ HONESTY ============ -->
+<!-- 06 RECAP -->
+<section class="row flip" id="m6">
+  <div class="txt">
+    <p class="kicker">06 · recap</p>
+    <h2>One end-of-day chat, and tomorrow adapts.</h2>
+    <p>The brain gives the day back in a line and asks the one thing it can't read from the numbers —
+      how it actually felt. Answer in a voice note on the way out, and it doesn't sit in a chat log: a
+      busy night lifts tomorrow's forecast, a tray of waste trims tomorrow's par.</p>
+    <p class="fine">no forms — a recap and a voice note. what you say changes the plan for tomorrow,
+      right in front of you.</p>
+  </div>
+  <div class="stagecell">
+    <div class="stage frame" data-stage="recap" id="recapstage">
+      <div class="chrome"><span class="dot"></span>Burger House · Downtown<span class="right">day recap · at close</span></div>
+      <div class="canvas">
+        <div class="pwho r6"><span class="dot"></span><b>the brain</b> · day recap</div>
+        <p class="pq2 r6">today: quiet lunch, hot dinner. anything to note before I set tomorrow up?</p>
+        <div class="bubble you voice r6">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="6" y="2" width="4" height="7" rx="2"/><path d="M3.5 8a4.5 4.5 0 0 0 9 0M8 12.5V14"/></svg>
+          <span class="wave"><i style="--d:0s"></i><i style="--d:.12s"></i><i style="--d:.24s"></i><i style="--d:.36s"></i><i style="--d:.18s"></i><i style="--d:.3s"></i><i style="--d:.08s"></i><i style="--d:.22s"></i></span>
+          <span class="vdur">0:04</span>
+        </div>
+        <p class="transcript r6"><span class="tl">voice note →</span> "busier than usual — and we binned a tray of buns"</p>
+        <div class="bubble brain r6">thanks — on it.</div>
+        <div class="adaptbox r6">
+          <span class="al">adapted to your day</span>
+          <div class="adaptrow"><span class="ak">tomorrow's forecast</span><span class="av"><span id="fcnum">€4,400</span> <span class="up" id="fcup"></span></span></div>
+          <div class="adaptrow"><span class="ak">waste · burger buns, 1 tray</span><span class="av">logged · par trimmed</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
 <section class="honest stage" id="honest">
-  <p class="eyebrow" data-r="1">what this demo is — exactly</p>
-  <h2 data-r="1">Honest about its own seams.</h2>
+  <p class="eyebrow" data-r="1">about this demo</p>
+  <h2 data-r="1">A real engine on a made-up restaurant.</h2>
   <ul>
-    <li data-r="2"><b>Every number you scrolled past is real engine output</b> — captured
-      byte-for-byte from the production API running over a seeded, fictional tenant
-      ("Burger House", world frozen at 2026-05-31). Nothing on this page was composed by hand.</li>
-    <li data-r="2"><b>The app behind the buttons is the real frontend</b>, built statically:
-      reads replay those captures; the five write loops (counts, sends, corrections, invoice
-      upload) are simulated in-browser against the same rules the backend applies.</li>
-    <li data-r="3"><b>The invoice "OCR" in this demo assembles its extract from the order
-      book</b> — the production extractor is an LLM behind a fail-loud seam, not shipped in a
-      static page. The receiving pill's "file a sample one" button makes the flow testable:
-      the sample carries one price 5% over last-paid, so you can watch it land on the draft
-      order and raise the price flag (which the nightly run raises in production).</li>
-    <li data-r="3"><b>The report card says "small n" because n is small.</b> 13 banded
-      forecasts is a calibration baseline. The claim is the discipline — forecast, band, grade,
-      publish — not the percentage.</li>
-    <li data-r="4"><b>The platform's source is private;</b> this page and the built bundle are
-      the showcase. The logic is documented in the <a href="https://github.com/Michiel-DK/roger-brain-demo#readme">README</a>.</li>
+    <li data-r="2"><b>"Burger House" is fictional — the engine behind it isn't.</b> Every figure you
+      scrolled past is real output from the same system that would run on your venues, over a seeded
+      demo history. Nothing on this page was mocked up by hand.</li>
+    <li data-r="3"><b>The invoice reader never invents a number.</b> It echoes back exactly what it read;
+      if it can't read a line, it says so and prices nothing.</li>
+    <li data-r="4"><b>It runs on a small demo history, so the numbers are illustrative.</b> What's real is
+      the loop — learn, order, check, recap, learn again — which runs the same once it's on your data.
+      The logic is documented in the <a href="https://github.com/Michiel-DK/roger-brain-demo#readme">README</a>.</li>
   </ul>
 </section>
 
 <footer>
   <p class="eyebrow">roger brain</p>
-  <p>Learn from files you have · refill from the forecast · doubt the books out loud ·
-    ask one question · recap and grade itself.</p>
-  <div class="cta">
-    <a class="btn" href="https://github.com/Michiel-DK/roger-brain-demo#readme">read the logic</a>
-  </div>
+  <p>Learn each venue · keep the levels · draft the orders · read the door · spot-check the floor ·
+    recap once, and learn from the day.</p>
+  <div class="cta"><a class="btn" href="https://github.com/Michiel-DK/roger-brain-demo#readme">read the logic</a></div>
 </footer>
 
 <script>
-  // Reveal stages when they enter; reset when they fully leave (so re-scroll replays).
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       e.target.classList.toggle("on", e.isIntersecting);
-      if (e.target.dataset.stage === "pill") e.isIntersecting ? startPill() : stopPill();
-      if (e.target.dataset.stage === "door") e.isIntersecting ? startDoor() : stopDoor();
+      const s = e.target.dataset.stage;
+      if (s === "learn") e.isIntersecting ? startLearn() : stopLearn();
+      if (s === "order") e.isIntersecting ? startOrder() : stopOrder();
+      if (s === "door") e.isIntersecting ? startDoor() : stopDoor();
+      if (s === "doubt") e.isIntersecting ? startDoubt() : stopDoubt();
+      if (s === "recap") e.isIntersecting ? startRecap() : stopRecap();
     }
-  }, { threshold: 0.35 });
+  }, { threshold: 0.3 });
   document.querySelectorAll(".stage").forEach((el) => io.observe(el));
 
-  // The door beat — the invoice drops in, goes into the chat, gets filed.
+  function typeInto(el, text, cps, done) {
+    let i = 0;
+    const t = setInterval(() => { el.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(t); done && done(); } }, cps);
+    return t;
+  }
+  const clearAll = (arr) => { arr.forEach((t) => { clearTimeout(t); clearInterval(t); }); return []; };
+
+  // 01 learn — venues resolve in turn, then the group brain forms
+  let learnTimers = [];
+  function startLearn() {
+    stopLearn();
+    const cards = document.querySelectorAll("#learncanvas .vcard"), gb = document.getElementById("groupbox");
+    if (REDUCED) { cards.forEach((c) => c.classList.add("resolved")); gb.classList.add("in"); return; }
+    cards.forEach((c, i) => learnTimers.push(setTimeout(() => c.classList.add("resolved"), 1200 + i * 1300)));
+    learnTimers.push(setTimeout(() => gb.classList.add("in"), 1200 + 3 * 1300));
+  }
+  function stopLearn() {
+    learnTimers = clearAll(learnTimers);
+    document.querySelectorAll("#learncanvas .vcard").forEach((c) => c.classList.remove("resolved"));
+    document.getElementById("groupbox").classList.remove("in");
+  }
+
+  // 03 orders — draft, then a line opens and amends
+  let orderTimers = [];
+  function startOrder() {
+    stopOrder();
+    const c = document.getElementById("ordercanvas"), sv = document.getElementById("beefqty");
+    if (REDUCED) { c.dataset.o = "amended"; sv.textContent = "14"; return; }
+    orderTimers.push(setTimeout(() => { c.dataset.o = "open"; }, 1500));
+    orderTimers.push(setTimeout(() => { sv.textContent = "13"; }, 2500));
+    orderTimers.push(setTimeout(() => { sv.textContent = "14"; c.dataset.o = "amended"; }, 2750));
+  }
+  function stopOrder() {
+    orderTimers = clearAll(orderTimers);
+    const c = document.getElementById("ordercanvas"), sv = document.getElementById("beefqty");
+    if (c) c.dataset.o = "idle"; if (sv) sv.textContent = "12";
+  }
+
+  // 04 receiving pill — invoice → text
+  const DOOR_Q = "what landed at the door? photo the invoice and I'll read it.";
   let doorTimers = [];
   function startDoor() {
     stopDoor();
-    const c = document.getElementById("doorcanvas");
-    if (REDUCED) { c.dataset.p = "filed"; return; }
-    doorTimers = [
-      setTimeout(() => { c.dataset.p = "paper"; }, 1600),
-      setTimeout(() => { c.dataset.p = "read"; }, 3000),
-      setTimeout(() => { c.dataset.p = "filed"; }, 4400),
-    ];
+    const c = document.getElementById("doorcanvas"), q = document.getElementById("doorq"), caret = document.getElementById("doorcaret");
+    q.textContent = "";
+    if (REDUCED) { q.textContent = DOOR_Q; caret.style.display = "none"; c.dataset.p = "filed"; return; }
+    caret.style.display = ""; c.dataset.p = "open";
+    doorTimers.push(typeInto(q, DOOR_Q, 26, () => { caret.style.display = "none"; }));
+    doorTimers.push(setTimeout(() => { c.dataset.p = "reading"; }, 2600));
+    doorTimers.push(setTimeout(() => { c.dataset.p = "read"; }, 4600));
+    doorTimers.push(setTimeout(() => { c.dataset.p = "filed"; }, 6000));
   }
   function stopDoor() {
-    doorTimers.forEach(clearTimeout);
-    doorTimers = [];
-    document.getElementById("doorcanvas").dataset.p = "";
+    doorTimers = clearAll(doorTimers);
+    const c = document.getElementById("doorcanvas"), caret = document.getElementById("doorcaret");
+    if (c) c.dataset.p = "idle"; if (caret) caret.style.display = "";
   }
 
-  // The pill typewriter — question, then the answer typed into the field.
-  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const Q = "Quick check — how many Beef patty (165g) do you count right now?";
-  const A = "412";
-  let timers = [];
-  function typeInto(el, text, cps, done) {
-    let i = 0;
+  // 05 doubt — top item ticks over → sent to check → thanks
+  let doubtTimers = [];
+  function startDoubt() {
+    stopDoubt();
+    const c = document.getElementById("doubtcanvas"), st = document.getElementById("pattystat");
+    if (REDUCED) { c.dataset.d = "done"; st.textContent = "✓ 412"; return; }
+    doubtTimers.push(setTimeout(() => { c.dataset.d = "sent"; st.textContent = "→ sent to the pill"; }, 1200));
+    doubtTimers.push(setTimeout(() => { c.dataset.d = "pill"; }, 2400));
+    doubtTimers.push(setTimeout(() => { c.dataset.d = "reply"; st.textContent = "✓ 412"; }, 3700));
+    doubtTimers.push(setTimeout(() => { c.dataset.d = "done"; }, 4600));
+  }
+  function stopDoubt() {
+    doubtTimers = clearAll(doubtTimers);
+    const c = document.getElementById("doubtcanvas"), st = document.getElementById("pattystat");
+    if (c) c.dataset.d = "idle"; if (st) st.textContent = "";
+  }
+
+  // 06 recap — question, reply, then tomorrow's forecast adapts (counts up)
+  let recapTimers = [];
+  function countUp(el, from, to, upEl) {
+    const steps = 16; let i = 0;
     const t = setInterval(() => {
-      el.textContent = text.slice(0, ++i);
-      if (i >= text.length) { clearInterval(t); done && done(); }
-    }, cps);
-    timers.push(t);
+      i++;
+      el.textContent = "€" + Math.round(from + (to - from) * (i / steps)).toLocaleString("en-US");
+      if (i >= steps) { clearInterval(t); if (upEl) upEl.textContent = "↑ busier day"; }
+    }, 45);
+    recapTimers.push(t);
   }
-  function startPill() {
-    stopPill();
-    const q = document.getElementById("typeq"), a = document.getElementById("typea");
-    q.textContent = ""; a.textContent = "";
-    if (REDUCED) { q.textContent = Q; a.textContent = A; return; }
-    typeInto(q, Q, 28, () => timers.push(setTimeout(() => typeInto(a, A, 140), 500)));
+  function startRecap() {
+    stopRecap();
+    const steps = document.querySelectorAll("#recapstage .r6");
+    const fc = document.getElementById("fcnum"), up = document.getElementById("fcup");
+    if (REDUCED) { steps.forEach((s) => s.classList.add("in")); fc.textContent = "€4,650"; up.textContent = "↑ busier day"; return; }
+    steps.forEach((s, i) => recapTimers.push(setTimeout(() => {
+      s.classList.add("in");
+      if (s.classList.contains("adaptbox")) countUp(fc, 4400, 4650, up);
+    }, 450 + i * 650)));
   }
-  function stopPill() { timers.forEach(clearTimeout); timers.forEach(clearInterval); timers = []; }
+  function stopRecap() {
+    recapTimers = clearAll(recapTimers);
+    document.querySelectorAll("#recapstage .r6").forEach((s) => s.classList.remove("in"));
+    const fc = document.getElementById("fcnum"), up = document.getElementById("fcup");
+    if (fc) fc.textContent = "€4,400"; if (up) up.textContent = "";
+  }
 </script>
 </body>
 </html>
