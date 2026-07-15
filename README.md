@@ -2,6 +2,9 @@
 
 Live demo: https://michiel-dk.github.io/roger-brain-demo/
 
+This is a demonstration of a forecast-and-self-grade loop running on synthetic restaurant data —
+a methodology demo, not a production system.
+
 An operations platform for independent restaurant groups: ingest sales and invoices, model the
 recipe → ingredient → supplier graph, forecast demand, draft the supplier orders, ask the floor
 one question a day, and check its own predictions against reality and publish the score.
@@ -12,8 +15,8 @@ FOH pill and the receiving pill, all working in the browser. The platform's sour
 private; this page is the showcase.
 
 > Everything in the demo is a fictional tenant ("Burger House", three venues, world frozen at
-> 2026-05-31). Every number shown is a real response from the production API over that seeded
-> world — captured byte-for-byte, not composed. The write loops (counts, order sends,
+> 2026-05-31). Every number shown is a captured response from the app's API over that seeded
+> world — recorded byte-for-byte, not composed. The write loops (counts, order sends,
 > corrections, invoice upload) are simulated in-browser against the same rules the backend
 > applies.
 
